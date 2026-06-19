@@ -168,7 +168,7 @@ I enjoy exploring complex systems, challenging assumptions, and building project
       tagline: "Automated investment intelligence",
       category: "AI · FinTech",
       color: "#ff006e",
-      liveUrl: "https://deep-asset-research.netlify.app/",
+      liveUrl: "https://deep-asset-research.onrender.com",
       summary:
         "An AI-powered platform that ingests SEC filings and shareholder letters to generate actionable investment research summaries.",
       details: {
