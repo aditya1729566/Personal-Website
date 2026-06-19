@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, X, Send, Sparkles, Loader2 } from "lucide-react";
-import { Spade, ChessKnight, PokerChip } from "./ChessPokerIcons";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Bot, Loader2, MessageSquare, Send, X } from "lucide-react";
 
 type Message = {
   role: "user" | "assistant";
@@ -11,10 +10,10 @@ type Message = {
 };
 
 const SUGGESTED_PROMPTS = [
-  "What's your quant research about?",
-  "Tell me about your projects",
-  "What are your long-term goals?",
-  "Tell me about chess & poker theory",
+  "Summarize Aditya's projects",
+  "What is Aditya studying right now?",
+  "What is his quant research about?",
+  "What are his long-term goals?",
 ];
 
 export default function DigitalTwinChat() {
@@ -23,7 +22,7 @@ export default function DigitalTwinChat() {
     {
       role: "assistant",
       content:
-        "Hey — I'm Aditya's digital twin. Ask me anything about my career, research, projects, or chess and poker strategies.",
+        "Hi, I can answer questions about Aditya's background, current study areas, projects, research interests, and goals using the facts on this site.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -37,58 +36,40 @@ export default function DigitalTwinChat() {
   }, [messages, loading]);
 
   useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 300);
-    }
+    if (!open) return;
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 150);
+    return () => window.clearTimeout(focusTimer);
   }, [open]);
 
   const sendMessage = async (text: string) => {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
 
-    setError(null);
     const userMessage: Message = { role: "user", content: trimmed };
     const nextMessages = [...messages, userMessage];
+
     setMessages(nextMessages);
     setInput("");
+    setError(null);
     setLoading(true);
 
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: nextMessages.slice(1),
-        }),
+        body: JSON.stringify({ messages: nextMessages.slice(1) }),
       });
-
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to get a response.");
+        throw new Error(data.error || "The assistant could not respond.");
       }
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: data.message },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: data.message }]);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to connect to Digital Twin.";
-      setError(msg);
+      setError(err instanceof Error ? err.message : "The assistant could not respond.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    sendMessage(input);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage(input);
     }
   };
 
@@ -97,96 +78,76 @@ export default function DigitalTwinChat() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-[2px] sm:bg-transparent sm:backdrop-blur-none"
-            onClick={() => setOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 24, scale: 0.95 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="glossy-chat fixed right-4 bottom-6 z-[70] sm:right-10 sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 flex min-h-[420px] max-h-[85vh] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[28px] border border-accent-gold/25 bg-charcoal glass border-gradient shadow-[0_20px_70px_rgba(0,0,0,0.35)]"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: 0.18 }}
+            className="fixed bottom-24 right-4 z-50 flex max-h-[78vh] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden rounded-lg border border-border bg-white shadow-2xl sm:right-6"
+            role="dialog"
+            aria-label="Digital twin chat"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-accent-gold/15 bg-charcoal-light px-4 py-3">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-gold/10 text-accent-gold">
-                  <ChessKnight size={18} />
+                <div className="flex h-9 w-9 items-center justify-center rounded-md bg-surface text-accent-blue">
+                  <Bot size={18} />
                 </div>
                 <div>
-                  <p className="font-[family-name:var(--font-syne)] text-xs font-bold text-foreground">
-                    Aditya's Digital Twin
-                  </p>
-                  <p className="text-[8px] tracking-widest uppercase text-accent-gold/75 font-semibold">
-                    Strategic AI Assistant
-                  </p>
+                  <p className="text-sm font-bold text-foreground">Digital Twin</p>
+                  <p className="text-xs text-muted">Answers from site facts</p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setOpen(false)}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-muted transition-colors hover:bg-white/[0.05] hover:text-foreground cursor-pointer"
+                className="rounded-md p-2 text-muted transition hover:bg-surface hover:text-foreground"
                 aria-label="Close chat"
               >
-                <X size={14} />
+                <X size={18} />
               </button>
             </div>
 
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ scrollbarWidth: "none" }}>
-              {messages.map((msg, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                >
+            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+              {messages.map((message, index) => (
+                <div key={`${message.role}-${index}`} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                   <div
-                    className={`max-w-[85%] rounded-xl px-3.5 py-2 text-xs leading-relaxed ${
-                      msg.role === "user"
-                        ? "rounded-br-sm bg-gradient-to-r from-accent-gold to-accent-magenta text-charcoal font-semibold shadow-sm"
-                        : "rounded-bl-sm border border-accent-gold/10 bg-felt-dark/30 text-muted font-medium"
+                    className={`max-w-[86%] rounded-lg px-3.5 py-2.5 text-sm leading-6 ${
+                      message.role === "user"
+                        ? "bg-accent-blue text-white"
+                        : "border border-border bg-surface text-foreground"
                     }`}
                   >
-                    {msg.content}
+                    {message.content}
                   </div>
-                </motion.div>
+                </div>
               ))}
 
               {loading && (
                 <div className="flex justify-start">
-                  <div className="flex items-center gap-1.5 rounded-xl rounded-bl-sm border border-accent-gold/15 bg-felt-dark/30 px-3.5 py-2 text-xs text-accent-gold">
-                    <Loader2 size={12} className="animate-spin text-accent-gold" />
-                    <span className="text-[10px] font-semibold">Calculating odds...</span>
+                  <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-muted">
+                    <Loader2 size={16} className="animate-spin" />
+                    Checking the profile...
                   </div>
                 </div>
               )}
 
               {error && (
-                <p className="text-center text-[10px] text-poker-red font-semibold">{error}</p>
+                <p className="rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+                  {error}
+                </p>
               )}
 
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Suggested Prompts */}
-            {messages.length <= 1 && !loading && (
-              <div className="px-4 pb-3 flex flex-col gap-1.5 select-none">
-                <p className="text-[8px] font-bold uppercase tracking-wider text-muted">Suggested Queries</p>
-                <div className="flex flex-wrap gap-1">
+            {messages.length === 1 && !loading && (
+              <div className="border-t border-border px-4 py-3">
+                <div className="flex flex-wrap gap-2">
                   {SUGGESTED_PROMPTS.map((prompt) => (
                     <button
                       key={prompt}
+                      type="button"
                       onClick={() => sendMessage(prompt)}
-                      className="rounded-lg border border-accent-gold/15 bg-charcoal-light px-2 py-1 text-[9px] text-muted text-left transition-all hover:border-accent-gold hover:text-accent-gold cursor-pointer"
+                      className="rounded-md border border-border bg-white px-2.5 py-1.5 text-xs font-semibold text-muted transition hover:border-accent-blue hover:text-accent-blue"
                     >
                       {prompt}
                     </button>
@@ -195,30 +156,36 @@ export default function DigitalTwinChat() {
               </div>
             )}
 
-            {/* Chat Input form */}
             <form
-              onSubmit={handleSubmit}
-              className="border-t border-accent-gold/15 bg-charcoal-light p-3"
+              onSubmit={(event) => {
+                event.preventDefault();
+                sendMessage(input);
+              }}
+              className="border-t border-border p-3"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-end gap-2">
                 <textarea
                   ref={inputRef}
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Ask a question..."
+                  onChange={(event) => setInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                      event.preventDefault();
+                      sendMessage(input);
+                    }
+                  }}
                   rows={1}
                   disabled={loading}
-                  className="max-h-20 flex-1 resize-none rounded-xl border border-accent-gold/15 bg-charcoal px-3 py-2 text-xs text-foreground placeholder:text-muted/50 focus:border-accent-gold focus:outline-none disabled:opacity-50"
-                  style={{ scrollbarWidth: "none" }}
+                  placeholder="Ask about Aditya..."
+                  className="max-h-24 flex-1 resize-none rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-accent-blue focus:outline-none disabled:opacity-60"
                 />
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent-gold text-charcoal hover:shadow-[0_0_10px_rgba(207,168,70,0.3)] transition-opacity disabled:opacity-40 cursor-pointer"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-foreground text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                   aria-label="Send message"
                 >
-                  <Send size={12} />
+                  <Send size={16} />
                 </button>
               </div>
             </form>
@@ -226,23 +193,16 @@ export default function DigitalTwinChat() {
         )}
       </AnimatePresence>
 
-      {/* Floating Toggle Button (Poker Chip Badge) */}
-      <motion.button
-        onClick={() => setOpen(!open)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-4 z-[70] flex items-center gap-2 rounded-full border border-accent-gold/40 bg-charcoal px-4.5 py-3 text-xs font-bold tracking-wider uppercase text-accent-gold shadow-[0_0_20px_rgba(207,168,70,0.25)] hover:border-accent-gold sm:right-6 cursor-pointer"
-        aria-label={open ? "Close chat" : "Ask Digital Twin"}
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className="fixed bottom-6 right-4 z-50 inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-3 text-sm font-bold text-white shadow-lg transition hover:opacity-90 sm:right-6"
+        aria-label={open ? "Close digital twin chat" : "Open digital twin chat"}
+        aria-expanded={open}
       >
-        {open ? (
-          <X size={15} />
-        ) : (
-          <>
-            <MessageSquare size={15} />
-            <span>Digital Twin</span>
-          </>
-        )}
-      </motion.button>
+        {open ? <X size={17} /> : <MessageSquare size={17} />}
+        <span>{open ? "Close" : "Ask"}</span>
+      </button>
     </>
   );
 }

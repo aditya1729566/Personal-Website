@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Clock, FolderOpen } from "lucide-react";
 import { profile } from "@/data/profile";
-import { ChessKing, Diamond } from "./ChessPokerIcons";
+import { Diamond } from "./ChessPokerIcons";
 
 const goalCategories = [
   { key: "finance" as const, label: "Finance", color: "#cfa846" },

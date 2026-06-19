@@ -62,7 +62,7 @@ export default function Research() {
                 </div>
 
                 <div className="mt-4 border-t border-accent-gold/5 pt-2 text-[8px] font-semibold text-accent-gold/40 select-none">
-                  RESEARCH AREA 0{i + 1} // ACTIVE
+                  RESEARCH AREA 0{i + 1} / ACTIVE
                 </div>
               </motion.div>
             );

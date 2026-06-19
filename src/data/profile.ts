@@ -3,6 +3,10 @@ export const profile = {
   tagline: "Quantitative mind. Relentless builder.",
   subtitle:
     "Aspiring quant investor, researcher, entrepreneur & mathematician — building at the intersection of markets, math, and technology.",
+  socialLinks: {
+    x: "https://x.com/aditya_quant",
+    github: "https://github.com/aditya1729566",
+  },
   about: `I am an aspiring quantitative investor, researcher, entrepreneur, and mathematician with a deep interest in financial markets, economics, risk management, and emerging technologies. My work sits at the intersection of mathematics, finance, insurance, artificial intelligence, and entrepreneurship.
 
 I enjoy exploring complex systems, challenging assumptions, and building projects that combine rigorous analytical thinking with practical real-world applications. My long-term ambition is to conduct impactful research, build successful businesses, and eventually manage a world-class hedge fund focused on quantitative and systematic investing.`,
@@ -24,6 +28,39 @@ I enjoy exploring complex systems, challenging assumptions, and building project
     "Philosophy",
     "Public Policy & Education Reform",
   ],
+  currentAreasOfStudy: {
+    quantitativeTrading: [
+      "Statistical arbitrage strategies",
+      "Mean reversion systems",
+      "Pairs trading",
+      "Market-neutral portfolio construction",
+      "Risk management",
+      "Portfolio optimization",
+      "Execution cost modeling",
+      "Market microstructure research",
+    ],
+    mathematics: [
+      "Advanced probability",
+      "Statistics",
+      "Stochastic processes",
+      "Financial mathematics",
+      "Mathematical modeling",
+    ],
+    economics: [
+      "Development economics",
+      "Insurance economics",
+      "Financial markets",
+      "Universal Basic Income (UBI)",
+      "Disaster recovery economics",
+    ],
+    technology: [
+      "Artificial Intelligence",
+      "Prompt Engineering",
+      "Python Programming",
+      "Financial Data Analysis",
+      "Software Development",
+    ],
+  },
   careerJourney: [
     {
       phase: "Foundation",
@@ -172,6 +209,27 @@ I enjoy exploring complex systems, challenging assumptions, and building project
         status: "Active Research",
       },
     },
+    {
+      id: "startup-exploration",
+      title: "Startup Exploration",
+      tagline: "AI, fintech, research, and scalable software ventures",
+      category: "Venture · Exploration",
+      color: "#0f766e",
+      summary:
+        "Experimenting with AI-driven businesses, financial technology products, research and analytics platforms, and scalable software ventures.",
+      details: {
+        overview:
+          "An ongoing exploration of business ideas at the intersection of AI, finance, research tooling, analytics platforms, and scalable software products.",
+        features: [
+          "AI-driven business exploration",
+          "Financial technology product research",
+          "Research and analytics platform ideas",
+          "Scalable software venture exploration",
+        ],
+        tech: ["AI", "FinTech", "Research Tools", "Software Ventures"],
+        status: "Exploration",
+      },
+    },
   ],
   researchAreas: [
     {
@@ -216,11 +274,22 @@ I enjoy exploring complex systems, challenging assumptions, and building project
     "Reading philosophy",
     "Financial market research",
     "Building software projects",
-    "Chess & poker theory",
+    "Studying economics",
+    "Learning about Bitcoin and cryptocurrencies",
+    "Chess",
+    "Poker theory",
     "Competitive problem solving",
-    "Bitcoin & cryptocurrencies",
     "Debating philosophical questions",
+    "Exploring new business ideas",
+    "Following developments in science and technology",
   ],
-  thinkers: ["Baruch Spinoza", "Friedrich Nietzsche", "Neil deGrasse Tyson"],
+  thinkers: ["Baruch Spinoza", "Friedrich Nietzsche", "Dostoyevsky"],
+  philosophyTopics: [
+    "Free will",
+    "Ethics",
+    "Consciousness",
+    "Knowledge and truth",
+    "Human decision-making",
+  ],
   portfolioUrl: "#portfolio-coming-soon",
 };

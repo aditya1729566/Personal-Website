@@ -35,7 +35,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${syne.variable} ${dmSans.variable}`}>
       <body className="antialiased">
-        <div className="noise-overlay" aria-hidden="true" />
         {children}
       </body>
     </html>
