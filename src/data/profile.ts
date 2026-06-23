@@ -121,48 +121,6 @@ I enjoy exploring complex systems, challenging assumptions, and building project
   ],
   projects: [
     {
-      id: "outsmarts",
-      title: "Outsmarts",
-      tagline: "Multiplayer code-breaking game",
-      category: "Mobile · Flutter",
-      color: "#00f0ff",
-      liveUrl: "https://cool-fudge-4f3efa.netlify.app/",
-      summary:
-        "A cross-platform multiplayer game built with Flutter, combining strategic code-breaking gameplay with mobile-first design.",
-      details: {
-        overview:
-          "Outsmarts is an online multiplayer game where players compete in code-breaking challenges. Built from the ground up with Flutter, it delivers a seamless experience across iOS and Android with real-time multiplayer mechanics.",
-        features: [
-          "Multiplayer code-breaking gameplay with real-time sessions",
-          "Mobile-first development optimized for touch interfaces",
-          "Cross-platform architecture — single codebase, dual deployment",
-          "Scalable game logic designed for competitive play",
-        ],
-        tech: ["Flutter", "Dart", "Firebase", "Mobile UI/UX"],
-        status: "Live Project",
-      },
-    },
-    {
-      id: "interactive-blackjack",
-      title: "Interactive BlackJack",
-      tagline: "Web-based Blackjack game",
-      category: "Web · Game",
-      color: "#00bcd4",
-      liveUrl: "https://interactive-blackjack.netlify.app/",
-      summary: "A browser-based interactive Blackjack game with animations and simple AI opponents.",
-      details: {
-        overview:
-          "Playable Blackjack implemented as a responsive web app. Features simple dealer AI, score tracking, and mobile-friendly controls.",
-        features: [
-          "Single-player Blackjack against dealer AI",
-          "Responsive UI with animated card dealing",
-          "Simple scoring and game flow",
-        ],
-        tech: ["React", "TypeScript", "CSS"],
-        status: "Live Project",
-      },
-    },
-    {
       id: "ai-research",
       title: "AI Financial Research Platform",
       tagline: "Automated investment intelligence",
@@ -190,6 +148,7 @@ I enjoy exploring complex systems, challenging assumptions, and building project
       tagline: "Systematic strategy development",
       category: "Quant · Research",
       color: "#8338ec",
+      liveUrl: "https://github.com/aditya1729566/MA-V-Kalman-Filter-Research",
       summary:
         "Rigorous backtesting and development of statistical arbitrage, pairs trading, and Kalman Filter-based trading models.",
       details: {
@@ -228,6 +187,48 @@ I enjoy exploring complex systems, challenging assumptions, and building project
         ],
         tech: ["AI", "FinTech", "Research Tools", "Software Ventures"],
         status: "Exploration",
+      },
+    },
+    {
+      id: "interactive-blackjack",
+      title: "Interactive BlackJack",
+      tagline: "Web-based Blackjack game",
+      category: "Web · Game",
+      color: "#00bcd4",
+      liveUrl: "https://interactive-blackjack.netlify.app/",
+      summary: "A browser-based interactive Blackjack game with animations and simple AI opponents.",
+      details: {
+        overview:
+          "Playable Blackjack implemented as a responsive web app. Features simple dealer AI, score tracking, and mobile-friendly controls.",
+        features: [
+          "Single-player Blackjack against dealer AI",
+          "Responsive UI with animated card dealing",
+          "Simple scoring and game flow",
+        ],
+        tech: ["React", "TypeScript", "CSS"],
+        status: "Live Project",
+      },
+    },
+    {
+      id: "outsmarts",
+      title: "Outsmarts",
+      tagline: "Multiplayer code-breaking game",
+      category: "Mobile · Flutter",
+      color: "#00f0ff",
+      liveUrl: "https://cool-fudge-4f3efa.netlify.app/",
+      summary:
+        "A cross-platform multiplayer game built with Flutter, combining strategic code-breaking gameplay with mobile-first design.",
+      details: {
+        overview:
+          "Outsmarts is an online multiplayer game where players compete in code-breaking challenges. Built from the ground up with Flutter, it delivers a seamless experience across iOS and Android with real-time multiplayer mechanics.",
+        features: [
+          "Multiplayer code-breaking gameplay with real-time sessions",
+          "Mobile-first development optimized for touch interfaces",
+          "Cross-platform architecture — single codebase, dual deployment",
+          "Scalable game logic designed for competitive play",
+        ],
+        tech: ["Flutter", "Dart", "Firebase", "Mobile UI/UX"],
+        status: "Live Project",
       },
     },
   ],
