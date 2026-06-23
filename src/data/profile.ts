@@ -169,6 +169,28 @@ I enjoy exploring complex systems, challenging assumptions, and building project
       },
     },
     {
+      id: "codeforces-training-dashboard",
+      title: "Codeforces Training Dashboard",
+      tagline: "Competitive programming progress analytics",
+      category: "CP · Analytics",
+      color: "#2563eb",
+      liveUrl: "https://codeforces-rating-improvement-tool.vercel.app",
+      summary:
+        "A training dashboard that tracks and analyzes Codeforces practice, rating growth, problem-solving patterns, and improvement progress.",
+      details: {
+        overview:
+          "A Codeforces-focused training dashboard for monitoring competitive programming progress. It helps users track practice history, analyze performance trends, and understand where their training is improving over time.",
+        features: [
+          "Codeforces training and progress tracking",
+          "Performance analytics across practice sessions",
+          "Rating and problem-solving trend analysis",
+          "Dashboard views for structured improvement",
+        ],
+        tech: ["React", "Analytics", "Codeforces API", "Vercel"],
+        status: "Live Project",
+      },
+    },
+    {
       id: "startup-exploration",
       title: "Startup Exploration",
       tagline: "AI, fintech, research, and scalable software ventures",
