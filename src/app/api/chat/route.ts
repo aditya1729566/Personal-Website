@@ -1,13 +1,48 @@
 import { buildDigitalTwinSystemPrompt } from "@/lib/digital-twin-prompt";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL = "openai/gpt-oss-120b:free";
-const REQUEST_TIMEOUT_MS = 15000;
+const DEFAULT_MODELS = [
+  "openai/gpt-oss-20b:free",
+  "openai/gpt-oss-120b:free",
+  "meta-llama/llama-3.3-70b-instruct:free",
+];
+const REQUEST_TIMEOUT_MS = 30000;
 
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
 };
+
+type OpenRouterError = {
+  status: number;
+  body: string;
+  model: string;
+};
+
+function getModelCandidates() {
+  const configured = [
+    process.env.OPENROUTER_MODEL,
+    process.env.OPENROUTER_FALLBACK_MODELS,
+  ]
+    .filter(Boolean)
+    .flatMap((models) => models!.split(","))
+    .map((model) => model.trim())
+    .filter(Boolean);
+
+  return Array.from(new Set([...configured, ...DEFAULT_MODELS]));
+}
+
+function shouldTryNextModel(status: number) {
+  return status === 408 || status === 409 || status === 429 || status >= 500;
+}
+
+function getClientErrorMessage(errors: OpenRouterError[]) {
+  if (errors.every((error) => error.status === 429)) {
+    return "The AI providers are temporarily rate-limited. Please try again in a minute.";
+  }
+
+  return "Failed to get a response from the AI model.";
+}
 
 export async function POST(request: Request) {
   try {
@@ -44,51 +79,85 @@ export async function POST(request: Request) {
       );
     }
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const modelCandidates = getModelCandidates();
+    const upstreamErrors: OpenRouterError[] = [];
 
-    const response = await fetch(OPENROUTER_URL, {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer":
-          process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-        "X-Title": "Aditya Agrawal Digital Twin",
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        temperature: 0.2,
-        max_tokens: 450,
-        messages: [
-          { role: "system", content: buildDigitalTwinSystemPrompt() },
-          ...sanitized,
-        ],
-      }),
-    });
-    clearTimeout(timeout);
+    for (const model of modelCandidates) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenRouter error:", response.status, errorText);
-      return Response.json(
-        { error: "Failed to get a response from the AI model." },
-        { status: response.status }
-      );
+      try {
+        const response = await fetch(OPENROUTER_URL, {
+          method: "POST",
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer":
+              process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+            "X-Title": "Aditya Agrawal Digital Twin",
+          },
+          body: JSON.stringify({
+            model,
+            temperature: 0.2,
+            max_tokens: 450,
+            messages: [
+              { role: "system", content: buildDigitalTwinSystemPrompt() },
+              ...sanitized,
+            ],
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          upstreamErrors.push({ status: response.status, body: errorText, model });
+          console.error("OpenRouter error:", response.status, model, errorText);
+
+          if (shouldTryNextModel(response.status)) {
+            continue;
+          }
+
+          return Response.json(
+            { error: "Failed to get a response from the AI model." },
+            { status: response.status }
+          );
+        }
+
+        const data = await response.json();
+        const reply = data.choices?.[0]?.message?.content;
+
+        if (!reply) {
+          upstreamErrors.push({
+            status: 502,
+            body: "No response content received from the model.",
+            model,
+          });
+          console.error("OpenRouter empty response:", model, data);
+          continue;
+        }
+
+        return Response.json({ message: reply });
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          upstreamErrors.push({
+            status: 504,
+            body: "OpenRouter request timed out.",
+            model,
+          });
+          console.error("OpenRouter timeout:", model);
+          continue;
+        }
+
+        throw error;
+      } finally {
+        clearTimeout(timeout);
+      }
     }
 
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content;
-
-    if (!reply) {
-      return Response.json(
-        { error: "No response content received from the model." },
-        { status: 502 }
-      );
-    }
-
-    return Response.json({ message: reply });
+    return Response.json(
+      { error: getClientErrorMessage(upstreamErrors) },
+      { status: upstreamErrors.every((error) => error.status === 429) ? 429 : 503 }
+    );
   } catch (error) {
     console.error("Chat API error:", error);
     if (error instanceof DOMException && error.name === "AbortError") {
