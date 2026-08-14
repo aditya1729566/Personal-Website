@@ -661,6 +661,7 @@ export default function Premium3DScene({ exploreMode = false, onExploreChange }:
     const onCanvasClick = (event: MouseEvent) => {
       updateRayPointer(event);
       if (!exploreRef.current) {
+        if (window.innerWidth < 700) return;
         onExploreChangeRef.current?.(true);
         return;
       }
@@ -767,9 +768,9 @@ export default function Premium3DScene({ exploreMode = false, onExploreChange }:
       sunGlow.material.rotation = elapsed * 0.045 * motionScale;
       sunGlow.scale.setScalar(1.05 + Math.sin(elapsed * 1.2) * 0.05);
 
-      const targetScale = (isMobile ? 0.62 : 0.96) + deepZoom * (isMobile ? 0.7 : 0.95);
-      const targetX = isMobile ? 0.38 - deepZoom * 1.16 : 2.28 - deepZoom * 1.95;
-      const targetY = isMobile ? -1.32 + deepZoom * 0.42 : -0.95 + deepZoom * 0.62;
+      const targetScale = (isMobile ? 0.3 : 0.96) + deepZoom * (isMobile ? 0.25 : 0.95);
+      const targetX = isMobile ? 0.04 - deepZoom * 0.5 : 2.28 - deepZoom * 1.95;
+      const targetY = isMobile ? -1.08 + deepZoom * 0.24 : -0.95 + deepZoom * 0.62;
       solarSystem.scale.setScalar(THREE.MathUtils.lerp(solarSystem.scale.x, targetScale, 0.05));
       solarSystem.position.x = THREE.MathUtils.lerp(solarSystem.position.x, targetX + pointer.x * 0.1, 0.045);
       solarSystem.position.y = THREE.MathUtils.lerp(solarSystem.position.y, targetY - pointer.y * 0.08, 0.045);
@@ -782,7 +783,7 @@ export default function Premium3DScene({ exploreMode = false, onExploreChange }:
       stars.position.z = deepZoom * 1.65;
 
       if (isMobile) {
-        cameraTarget.set(0.95 - deepZoom * 0.72, -0.05 + deepZoom * 0.22, -1.25 + deepZoom * 0.38);
+        cameraTarget.set(0.44 - deepZoom * 0.28, -0.08 + deepZoom * 0.12, -1.22 + deepZoom * 0.22);
       } else {
         cameraTarget.set(1.65 - deepZoom * 0.92, -0.2 + deepZoom * 0.3, -1.4 + deepZoom * 0.46);
       }
@@ -793,9 +794,9 @@ export default function Premium3DScene({ exploreMode = false, onExploreChange }:
       }
       focusTarget.lerp(desiredFocusTarget, selectedBody ? 0.05 : 0.08);
       const pointerCameraInfluence = selectedBody ? 0.28 : 1;
-      camera.position.x += ((isMobile ? 0.1 : 0.78) + pointer.x * 0.18 * pointerCameraInfluence + deepZoom * (isMobile ? 0.25 : 0.62) - camera.position.x) * 0.045;
-      camera.position.y += ((isMobile ? 4.25 : 5.0) - pointer.y * 0.14 - deepZoom * (isMobile ? 1.28 : 1.72) - camera.position.y) * 0.045;
-      camera.position.z += ((isMobile ? 7.85 : 7.4) - deepZoom * (isMobile ? 3.2 : 3.85) - camera.position.z) * 0.045;
+      camera.position.x += ((isMobile ? 0.02 : 0.78) + pointer.x * 0.18 * pointerCameraInfluence + deepZoom * (isMobile ? 0.08 : 0.62) - camera.position.x) * 0.045;
+      camera.position.y += ((isMobile ? 4.7 : 5.0) - pointer.y * 0.14 - deepZoom * (isMobile ? 0.74 : 1.72) - camera.position.y) * 0.045;
+      camera.position.z += ((isMobile ? 9.75 : 7.4) - deepZoom * (isMobile ? 1.82 : 3.85) - camera.position.z) * 0.045;
       camera.lookAt(focusTarget);
 
       renderer.render(scene, camera);

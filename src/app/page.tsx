@@ -93,6 +93,7 @@ export default function Home() {
 
   const handleEmptySpaceExplorePointer = (event: PointerEvent<HTMLElement>) => {
     if (solarExplore) return;
+    if (event.pointerType !== "mouse") return;
     const target = event.target as HTMLElement;
     if (
       target.closest(
