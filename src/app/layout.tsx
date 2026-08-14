@@ -1,23 +1,25 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans } from "next/font/google";
+import { Orbitron, Space_Mono } from "next/font/google";
 import "./globals.css";
 
-const syne = Syne({
+const orbitron = Orbitron({
   subsets: ["latin"],
-  variable: "--font-syne",
+  variable: "--font-orbitron",
+  weight: ["500", "600", "700", "800", "900"],
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const spaceMono = Space_Mono({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-space-mono",
+  weight: ["400", "700"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Aditya Agrawal — Quantitative Investor & Builder",
   description:
-    "Aspiring quantitative investor, researcher, entrepreneur, and mathematician. Building at the intersection of finance, mathematics, and technology.",
+    "Quantitative investor, researcher, entrepreneur, and mathematician building at the intersection of finance, mathematics, and technology.",
   keywords: [
     "quantitative finance",
     "Aditya Agrawal",
@@ -33,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${syne.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${orbitron.variable} ${spaceMono.variable}`}>
       <body className="antialiased">
         {children}
       </body>

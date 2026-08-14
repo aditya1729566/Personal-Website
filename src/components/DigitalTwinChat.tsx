@@ -83,6 +83,7 @@ export default function DigitalTwinChat() {
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.18 }}
             className="fixed bottom-24 right-4 z-50 flex max-h-[78vh] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden rounded-lg border border-border bg-white shadow-2xl sm:right-6"
+            data-no-solar-explore
             role="dialog"
             aria-label="Digital twin chat"
           >
@@ -196,12 +197,12 @@ export default function DigitalTwinChat() {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="fixed bottom-6 right-4 z-50 inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-3 text-sm font-bold text-white shadow-lg transition hover:opacity-90 sm:right-6"
+        className="fixed bottom-4 right-4 z-50 inline-flex h-12 w-12 items-center justify-center rounded-md bg-cyan-300 text-sm font-bold text-slate-950 shadow-[0_18px_55px_rgba(34,211,238,0.22)] transition hover:bg-white sm:bottom-6 sm:right-6 sm:w-auto sm:gap-2 sm:px-4 sm:py-3"
         aria-label={open ? "Close digital twin chat" : "Open digital twin chat"}
         aria-expanded={open}
       >
         {open ? <X size={17} /> : <MessageSquare size={17} />}
-        <span>{open ? "Close" : "Ask"}</span>
+        <span className="hidden sm:inline">{open ? "Close" : "Ask"}</span>
       </button>
     </>
   );

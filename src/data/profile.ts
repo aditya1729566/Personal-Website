@@ -2,12 +2,12 @@ export const profile = {
   name: "Aditya Agrawal",
   tagline: "Quantitative mind. Relentless builder.",
   subtitle:
-    "Aspiring quant investor, researcher, entrepreneur & mathematician — building at the intersection of markets, math, and technology.",
+    "Quant investor, researcher, entrepreneur & mathematician building at the intersection of markets, math, and technology.",
   socialLinks: {
     x: "https://x.com/aditya_quant",
     github: "https://github.com/aditya1729566",
   },
-  about: `I am an aspiring quantitative investor, researcher, entrepreneur, and mathematician with a deep interest in financial markets, economics, risk management, and emerging technologies. My work sits at the intersection of mathematics, finance, insurance, artificial intelligence, and entrepreneurship.
+  about: `I am a quantitative investor, researcher, entrepreneur, and mathematician with a deep interest in financial markets, economics, risk management, and emerging technologies. My work sits at the intersection of mathematics, finance, insurance, artificial intelligence, and entrepreneurship.
 
 I enjoy exploring complex systems, challenging assumptions, and building projects that combine rigorous analytical thinking with practical real-world applications. My long-term ambition is to conduct impactful research, build successful businesses, and eventually manage a world-class hedge fund focused on quantitative and systematic investing.`,
   philosophy:
