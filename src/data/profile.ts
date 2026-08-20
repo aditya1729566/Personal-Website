@@ -126,9 +126,9 @@ I enjoy exploring complex systems, challenging assumptions, and building project
       tagline: "Automated investment intelligence",
       category: "AI · FinTech",
       color: "#ff006e",
-      liveUrl: "https://deep-asset-research.onrender.com",
+      liveUrl: "https://deep-asset-research.vercel.app",
       summary:
-        "An AI-powered platform that ingests SEC filings and shareholder letters to generate actionable investment research summaries.",
+        "A working research tool for reading 10-Ks, 10-Qs, and shareholder letters without losing the source material.",
       details: {
         overview:
           "This platform leverages large language models and structured financial data pipelines to analyze 10-K annual reports, 10-Q quarterly filings, and shareholder letters — transforming dense regulatory documents into concise, research-grade summaries for quantitative investors.",
@@ -150,7 +150,7 @@ I enjoy exploring complex systems, challenging assumptions, and building project
       color: "#8338ec",
       liveUrl: "https://github.com/aditya1729566/MA-V-Kalman-Filter-Research",
       summary:
-        "Rigorous backtesting and development of statistical arbitrage, pairs trading, and Kalman Filter-based trading models.",
+        "A pairs-trading research series using cointegration and Kalman-filter hedge ratios, including KO-PEP and MA-V tests.",
       details: {
         overview:
           "A comprehensive quantitative research framework for developing, testing, and validating systematic trading strategies. Focus on market-neutral portfolio construction, risk-adjusted returns, and execution cost modeling across equity pairs.",
@@ -176,7 +176,7 @@ I enjoy exploring complex systems, challenging assumptions, and building project
       color: "#2563eb",
       liveUrl: "https://codeforces-rating-improvement-tool.vercel.app",
       summary:
-        "A training dashboard that tracks and analyzes Codeforces practice, rating growth, problem-solving patterns, and improvement progress.",
+        "A dashboard I use to track Codeforces practice, rating movement, and the problem types that keep slowing me down.",
       details: {
         overview:
           "A Codeforces-focused training dashboard for monitoring competitive programming progress. It helps users track practice history, analyze performance trends, and understand where their training is improving over time.",

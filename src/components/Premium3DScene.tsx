@@ -154,7 +154,7 @@ function createFrame(
     group.add(piece);
   });
 
-  const titleTexture = createLabelTexture(exhibit);
+  const titleTexture = exhibit.artworkId === "rembrandt-self-portrait" ? null : createLabelTexture(exhibit);
   if (titleTexture) {
     createdTextures.push(titleTexture);
     const plaque = new THREE.Sprite(new THREE.SpriteMaterial({ map: titleTexture, depthTest: false, depthWrite: false }));
@@ -362,7 +362,7 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
       if (!createdTextures.includes(texture)) createdTextures.push(texture);
       const frame = createFrame(texture, exhibit, raycastTargets, frameMaterials, createdTextures, plaqueSprites);
       const side = exhibit.side === "right" ? 1 : exhibit.side === "left" ? -1 : 0;
-      frame.position.set(side * 5.74, 1.34, exhibit.z);
+      frame.position.set(side * 5.74, 1.34 + Math.sin(index * 2.17) * 0.025, exhibit.z);
       frame.rotation.y = side * -Math.PI / 2;
       frame.rotation.z = Math.sin(index * 1.73) * 0.0032;
       gallery.add(frame);

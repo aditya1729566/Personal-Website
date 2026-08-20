@@ -182,7 +182,7 @@ export default function Home() {
   }, [menuOpen]);
 
   return (
-    <main className="archive-site">
+    <main className={`archive-site${journeyProgress < 0.035 ? " is-at-entrance" : ""}`}>
       <a className="skip-link" href="#index">Skip to the collection</a>
       <Premium3DScene
         activeChapter={activeChapter}
@@ -251,7 +251,7 @@ export default function Home() {
       )}
 
       <aside className="chapter-rail" aria-label="Explore the four disciplines">
-        <p>Gallery directory</p>
+        <p>Rooms</p>
         {chapters.map((chapter) => (
           <button
             key={chapter.id}
@@ -268,7 +268,7 @@ export default function Home() {
       </aside>
 
       <div className="archive-progress" aria-hidden="true"><span style={{ transform: `scaleX(${scrollProgress})` }} /></div>
-      <div className="museum-location" aria-hidden="true">
+      <div className={`museum-location${journeyProgress >= 0.035 ? " is-visible" : ""}`} aria-hidden="true">
         <span>Room {String(Math.min(7, Math.round(journeyProgress * 7)) + 1).padStart(2, "0")} / 08</span>
         <span className="museum-location-line" />
         <span>{journeyProgress < 0.035 ? "Scroll to walk" : roomLabels[Math.min(7, Math.round(journeyProgress * 7))]}</span>
@@ -278,7 +278,7 @@ export default function Home() {
         <div className="archive-content hero-copy">
           <div className="hero-intro">
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="archive-label">
-              Personal museum / eight rooms of inquiry
+              Entrance gallery / Aditya&apos;s personal museum
             </motion.p>
             <motion.h1
               initial={{ opacity: 0, y: 34 }}
@@ -293,11 +293,10 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.16 }}
               className="hero-thesis"
             >
-              I study the forces behind choice, civilization, beauty, and price.
+              I study markets with mathematics, history, and code. Current work: Kalman-filter pairs models and tools that read SEC filings.
             </motion.p>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="hero-actions">
-              <a href="#work" onClick={(event) => handleSectionLink(event, "#work")}>Selected work <ArrowDown size={16} /></a>
-              <button type="button" onClick={() => goToChapter("philosophy")}>Enter the gallery <ArrowUpRight size={16} /></button>
+              <button type="button" onClick={() => goToChapter("philosophy")}>Enter the rooms <ArrowDown size={16} /></button>
             </motion.div>
           </div>
           <ArtworkPlaque artwork={artworks[0]} onInspect={setSelectedArtwork} variant="hero" />
@@ -308,9 +307,9 @@ export default function Home() {
       <section id="inquiry" className="archive-section inquiry-section" data-archive-chapter="philosophy">
         <div className="archive-content inquiry-copy">
           <Reveal>
-            <ChapterHeading label="Inquiry / Philosophy" title="Questions before answers." />
+            <ChapterHeading label="Room I / Philosophy" title="Questions before answers." />
             <p className="lead-copy">
-              My work begins with a philosophical habit: challenge the premise, define what can be known, then build a model that survives contact with reality.
+              I read Spinoza, Nietzsche, and Dostoyevsky because each forces the same useful habit: decide what you believe about choice before trying to model it.
             </p>
           </Reveal>
           <ArtworkPlaque artwork={artworks[1]} onInspect={setSelectedArtwork} />
@@ -320,9 +319,9 @@ export default function Home() {
       <section id="history" className="archive-section history-section" data-archive-chapter="history">
         <div className="archive-content history-copy">
           <Reveal>
-            <ChapterHeading label="Context / History" title="Every system has a memory." />
+            <ChapterHeading label="Room II / History" title="The past tests the model." />
             <p className="lead-copy">
-              History turns abstract incentives into evidence. It is where institutions, shocks, ambition, and human judgment reveal what a clean theory leaves out.
+              I use history to pressure-test theories. Institutions, market shocks, and disaster recovery show where a clean explanation stops being clean.
             </p>
           </Reveal>
           <ArtworkPlaque artwork={artworks[2]} onInspect={setSelectedArtwork} />
@@ -332,9 +331,9 @@ export default function Home() {
       <section id="art" className="archive-section art-section" data-archive-chapter="art">
         <div className="archive-content art-copy">
           <Reveal>
-            <ChapterHeading label="Attention / Art" title="Form makes thought visible." />
+            <ChapterHeading label="Room III / Art" title="Attention is a choice." />
             <p className="lead-copy">
-              Art is a discipline of attention. Composition, tension, and restraint can make complexity felt before it is explained, a useful lesson for research and software alike.
+              I look at painting to study decisions about emphasis: what gets sharpened, softened, or left out. The same choices appear when I make a chart or explain a trade.
             </p>
           </Reveal>
           <ArtworkPlaque artwork={artworks[3]} onInspect={setSelectedArtwork} />
@@ -344,9 +343,9 @@ export default function Home() {
       <section id="work" className="archive-section work-section" data-archive-chapter="markets">
         <div className="archive-content work-copy">
           <Reveal>
-            <ChapterHeading label="Practice / Quant finance" title="Models, tools, and live experiments." />
+            <ChapterHeading label="Room IV / Quant finance" title="Research that has to survive costs." />
             <p className="lead-copy">
-              I build at the intersection of quantitative finance, mathematics, AI, and market structure, with a bias toward research that can become a working system.
+              My pairs work tests dynamic hedge ratios with Kalman filters. KO-PEP reached a 1.9 Sharpe and MA-V 1.3 in the study; robustness and execution still decide whether the result matters.
             </p>
           </Reveal>
           <ArtworkPlaque artwork={artworks[4]} onInspect={setSelectedArtwork} />
@@ -356,7 +355,7 @@ export default function Home() {
       <section id="projects" className="archive-section project-section">
         <div className="archive-content work-copy">
           <Reveal>
-            <ChapterHeading label="Cases on file / Personal work" title="Selected work, currently live." />
+            <ChapterHeading label="Study room / Personal work" title="Things I have put into use." />
           </Reveal>
           <div className="project-ledger">
             {liveProjects.map((project, index) => (
@@ -387,16 +386,16 @@ export default function Home() {
       <section id="research" className="archive-section research-section" data-archive-chapter="history">
         <div className="archive-content research-copy">
           <Reveal>
-            <ChapterHeading label="Research / Applied systems" title="Risk is where disciplines meet." />
-            <p className="lead-copy">I study how uncertainty travels through insurance, markets, institutions, and the systems people depend on.</p>
+            <ChapterHeading label="Research room / Risk" title="Who absorbs the shock?" />
+            <p className="lead-copy">I study how insurance changes recovery after earthquakes and floods, especially where households and small businesses have little financial protection.</p>
           </Reveal>
           <ArtworkPlaque artwork={artworks[5]} onInspect={setSelectedArtwork} />
         </div>
       </section>
 
-      <section id="research-notes" className="archive-section research-notes-section">
+      <section id="current-questions" className="archive-section current-questions-section">
         <div className="archive-content research-copy">
-          <Reveal><ChapterHeading label="Research notes / Current questions" title="Where the inquiry continues." /></Reveal>
+          <Reveal><ChapterHeading label="Reading table / Current questions" title="Questions I am still working through." /></Reveal>
           <div className="research-lines">
             {profile.researchAreas.map((area, index) => (
               <Reveal key={area.title} delay={index * 0.07} className="research-line">
@@ -412,8 +411,8 @@ export default function Home() {
       <section id="future" className="archive-section future-section" data-archive-chapter="philosophy">
         <div className="archive-content future-copy">
           <Reveal>
-            <ChapterHeading label="Trajectory / The unfinished index" title="Research, enterprise, public consequence." />
-            <p className="lead-copy">I want the next room to hold ambitious research, durable businesses, and systems whose usefulness reaches beyond the model.</p>
+            <ChapterHeading label="Future room / Working plan" title="Study, test, write, repeat." />
+            <p className="lead-copy">I want to earn a PhD in mathematics, publish work in finance and economic policy, and eventually run a systematic fund. The immediate work is less grand: keep building and keep the results honest.</p>
           </Reveal>
           <ArtworkPlaque artwork={artworks[6]} onInspect={setSelectedArtwork} />
         </div>
@@ -422,10 +421,10 @@ export default function Home() {
       <section id="about" className="archive-section about-section" data-archive-chapter="art">
         <div className="archive-content future-copy">
           <Reveal>
-            <ChapterHeading label="Closing room / Personal direction" title="The work remains unfinished." />
+            <ChapterHeading label="Closing room / Personal direction" title="What I return to." />
           </Reveal>
           <Reveal delay={0.08} className="future-statement">
-            <p>{profile.about.split("\n\n")[1]}</p>
+            <p>I read philosophy, study probability, follow markets, play chess and poker, and build software to test ideas that would otherwise remain untested.</p>
             <div className="future-links">
               <a href={profile.socialLinks.github} target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={16} /></a>
               <a href={profile.socialLinks.x} target="_blank" rel="noreferrer">X / @aditya_quant <ArrowUpRight size={16} /></a>

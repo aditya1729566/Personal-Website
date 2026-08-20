@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bot, Loader2, MessageSquare, Send, X } from "lucide-react";
+import { Loader2, MessageSquare, Send, X } from "lucide-react";
 
 type Message = {
   role: "user" | "assistant";
@@ -22,7 +22,7 @@ export default function DigitalTwinChat() {
     {
       role: "assistant",
       content:
-        "Hi, I can answer questions about Aditya's background, current study areas, projects, research interests, and goals using the facts on this site.",
+        "This desk uses Aditya's profile record. Ask about his Kalman-filter research, projects, reading, or current study.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -82,57 +82,46 @@ export default function DigitalTwinChat() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.18 }}
-            className="fixed bottom-24 right-4 z-50 flex max-h-[78vh] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden border border-border bg-[#07131d] shadow-[0_24px_80px_rgba(0,0,0,0.6)] sm:right-6"
+            className="museum-chat-panel"
             data-no-solar-explore
             role="dialog"
-            aria-label="Digital twin chat"
+            aria-label="Ask about Aditya"
           >
-            <div className="flex items-center justify-between border-b border-border px-4 py-3">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center border border-border bg-surface text-accent-gold">
-                  <Bot size={18} />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-foreground">Digital Twin</p>
-                  <p className="text-xs text-muted">Answers from site facts</p>
-                </div>
+            <div className="museum-chat-header">
+              <div>
+                <p>Inquiry desk</p>
+                <span>Questions about the collection and its owner</span>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-md p-2 text-muted transition hover:bg-surface hover:text-foreground"
+                className="museum-chat-close"
                 aria-label="Close chat"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+            <div className="museum-chat-messages">
               {messages.map((message, index) => (
-                <div key={`${message.role}-${index}`} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[86%] rounded-lg px-3.5 py-2.5 text-sm leading-6 ${
-                      message.role === "user"
-                        ? "bg-[#9e3e32] text-white"
-                        : "border border-border bg-surface text-foreground"
-                    }`}
-                  >
+                <div key={`${message.role}-${index}`} className={`museum-chat-message ${message.role}`}>
+                  <div>
                     {message.content}
                   </div>
                 </div>
               ))}
 
               {loading && (
-                <div className="flex justify-start">
-                  <div className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-muted">
+                <div className="museum-chat-message assistant">
+                  <div className="museum-chat-loading">
                     <Loader2 size={16} className="animate-spin" />
-                    Checking the profile...
+                    Checking the catalogue...
                   </div>
                 </div>
               )}
 
               {error && (
-                <p className="rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+                <p className="museum-chat-error">
                   {error}
                 </p>
               )}
@@ -141,14 +130,15 @@ export default function DigitalTwinChat() {
             </div>
 
             {messages.length === 1 && !loading && (
-              <div className="border-t border-border px-4 py-3">
-                <div className="flex flex-wrap gap-2">
+              <div className="museum-chat-prompts">
+                <p>Suggested questions</p>
+                <div>
                   {SUGGESTED_PROMPTS.map((prompt) => (
                     <button
                       key={prompt}
                       type="button"
                       onClick={() => sendMessage(prompt)}
-                      className="border border-border bg-transparent px-2.5 py-1.5 text-xs font-semibold text-muted transition hover:border-accent-gold hover:text-accent-gold"
+                      className="museum-chat-prompt"
                     >
                       {prompt}
                     </button>
@@ -162,10 +152,12 @@ export default function DigitalTwinChat() {
                 event.preventDefault();
                 sendMessage(input);
               }}
-              className="border-t border-border p-3"
+              className="museum-chat-form"
             >
-              <div className="flex items-end gap-2">
+              <label htmlFor="museum-chat-input">Your question</label>
+              <div>
                 <textarea
+                  id="museum-chat-input"
                   ref={inputRef}
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
@@ -178,12 +170,12 @@ export default function DigitalTwinChat() {
                   rows={1}
                   disabled={loading}
                   placeholder="Ask about Aditya..."
-                  className="max-h-24 flex-1 resize-none border border-border bg-[#0b171e] px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-accent-gold focus:outline-none disabled:opacity-60"
+                  className="museum-chat-input"
                 />
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#9e3e32] text-white transition hover:bg-[#b34a3d] disabled:cursor-not-allowed disabled:opacity-40"
+                  className="museum-chat-send"
                   aria-label="Send message"
                 >
                   <Send size={16} />
@@ -197,12 +189,12 @@ export default function DigitalTwinChat() {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="fixed bottom-4 right-4 z-50 inline-flex h-12 w-12 items-center justify-center border border-[#c5a36a] bg-[#9e3e32] text-sm font-bold text-[#fff4df] shadow-[0_18px_55px_rgba(0,0,0,0.35)] transition hover:bg-[#b34a3d] sm:bottom-6 sm:right-6 sm:w-auto sm:gap-2 sm:px-4 sm:py-3"
-        aria-label={open ? "Close digital twin chat" : "Open digital twin chat"}
+        className={`museum-chat-trigger${open ? " is-open" : ""}`}
+        aria-label={open ? "Close inquiry desk" : "Open inquiry desk"}
         aria-expanded={open}
       >
         {open ? <X size={17} /> : <MessageSquare size={17} />}
-        <span className="hidden sm:inline">{open ? "Close" : "Ask"}</span>
+        <span>{open ? "Close" : "Inquiry desk"}</span>
       </button>
     </>
   );

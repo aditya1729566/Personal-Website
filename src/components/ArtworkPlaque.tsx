@@ -19,13 +19,13 @@ export function ArtworkPlaque({
     <button type="button" className={`artwork-plaque${variant === "hero" ? " artwork-plaque-hero" : ""}`} onClick={() => onInspect(artwork)} aria-label={`Inspect ${artwork.title} by ${artwork.artist}`}>
       <span className="artwork-plaque-kicker">On view / {artwork.room}</span>
       <strong>{artwork.title}</strong>
-      <span className="artwork-plaque-credit">{artwork.artist} · {artwork.year}</span>
+      <span className="artwork-plaque-credit"><span>{artwork.artist}</span><span>{artwork.year}</span></span>
       <span className="artwork-plaque-facts">
         <span><small>Medium</small>{artwork.medium}</span>
         <span><small>Collection</small>{artwork.collection}</span>
       </span>
       <span className="artwork-plaque-reason">{artwork.connection}</span>
-      <span className="artwork-plaque-action">Inspect work <Maximize2 size={13} /></span>
+      <span className="artwork-plaque-action">{variant === "hero" ? "View catalogue entry" : "Inspect work"} <Maximize2 size={13} /></span>
     </button>
   );
 }
