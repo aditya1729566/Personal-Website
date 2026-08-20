@@ -1,18 +1,25 @@
 import type { Metadata } from "next";
-import { Orbitron, Space_Mono } from "next/font/google";
+import { Cormorant_Garamond, IBM_Plex_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 
-const orbitron = Orbitron({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-orbitron",
-  weight: ["500", "600", "700", "800", "900"],
+  variable: "--font-cormorant",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
-const spaceMono = Space_Mono({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-space-mono",
-  weight: ["400", "700"],
+  variable: "--font-manrope",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-plex-mono",
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -35,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${orbitron.variable} ${spaceMono.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${manrope.variable} ${plexMono.variable}`}>
       <body className="antialiased">
         {children}
       </body>

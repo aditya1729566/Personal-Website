@@ -82,14 +82,14 @@ export default function DigitalTwinChat() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.18 }}
-            className="fixed bottom-24 right-4 z-50 flex max-h-[78vh] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden rounded-lg border border-border bg-white shadow-2xl sm:right-6"
+            className="fixed bottom-24 right-4 z-50 flex max-h-[78vh] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden border border-border bg-[#07131d] shadow-[0_24px_80px_rgba(0,0,0,0.6)] sm:right-6"
             data-no-solar-explore
             role="dialog"
             aria-label="Digital twin chat"
           >
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-md bg-surface text-accent-blue">
+                <div className="flex h-9 w-9 items-center justify-center border border-border bg-surface text-accent-gold">
                   <Bot size={18} />
                 </div>
                 <div>
@@ -113,7 +113,7 @@ export default function DigitalTwinChat() {
                   <div
                     className={`max-w-[86%] rounded-lg px-3.5 py-2.5 text-sm leading-6 ${
                       message.role === "user"
-                        ? "bg-accent-blue text-white"
+                        ? "bg-[#9e3e32] text-white"
                         : "border border-border bg-surface text-foreground"
                     }`}
                   >
@@ -148,7 +148,7 @@ export default function DigitalTwinChat() {
                       key={prompt}
                       type="button"
                       onClick={() => sendMessage(prompt)}
-                      className="rounded-md border border-border bg-white px-2.5 py-1.5 text-xs font-semibold text-muted transition hover:border-accent-blue hover:text-accent-blue"
+                      className="border border-border bg-transparent px-2.5 py-1.5 text-xs font-semibold text-muted transition hover:border-accent-gold hover:text-accent-gold"
                     >
                       {prompt}
                     </button>
@@ -178,12 +178,12 @@ export default function DigitalTwinChat() {
                   rows={1}
                   disabled={loading}
                   placeholder="Ask about Aditya..."
-                  className="max-h-24 flex-1 resize-none rounded-md border border-border bg-white px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-accent-blue focus:outline-none disabled:opacity-60"
+                  className="max-h-24 flex-1 resize-none border border-border bg-[#0b171e] px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-accent-gold focus:outline-none disabled:opacity-60"
                 />
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-foreground text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#9e3e32] text-white transition hover:bg-[#b34a3d] disabled:cursor-not-allowed disabled:opacity-40"
                   aria-label="Send message"
                 >
                   <Send size={16} />
@@ -197,7 +197,7 @@ export default function DigitalTwinChat() {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="fixed bottom-4 right-4 z-50 inline-flex h-12 w-12 items-center justify-center rounded-md bg-cyan-300 text-sm font-bold text-slate-950 shadow-[0_18px_55px_rgba(34,211,238,0.22)] transition hover:bg-white sm:bottom-6 sm:right-6 sm:w-auto sm:gap-2 sm:px-4 sm:py-3"
+        className="fixed bottom-4 right-4 z-50 inline-flex h-12 w-12 items-center justify-center border border-[#c5a36a] bg-[#9e3e32] text-sm font-bold text-[#fff4df] shadow-[0_18px_55px_rgba(0,0,0,0.35)] transition hover:bg-[#b34a3d] sm:bottom-6 sm:right-6 sm:w-auto sm:gap-2 sm:px-4 sm:py-3"
         aria-label={open ? "Close digital twin chat" : "Open digital twin chat"}
         aria-expanded={open}
       >

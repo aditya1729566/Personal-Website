@@ -1,422 +1,432 @@
 "use client";
 
-import { PointerEvent, ReactNode, useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowDown,
-  ArrowUpRight,
-  Bot,
-  ChartNoAxesCombined,
-  ExternalLink,
-  Github,
-  GraduationCap,
-  Layers3,
-  MousePointer2,
-  Orbit,
-  RotateCcw,
-  ShieldCheck,
-  Target,
-  X,
-} from "lucide-react";
+import dynamic from "next/dynamic";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowDown, ArrowUpRight, Github, Menu, X } from "lucide-react";
 
+import { ArtworkInspector, ArtworkPlaque } from "@/components/ArtworkPlaque";
 import DigitalTwinChat from "@/components/DigitalTwinChat";
-import Premium3DScene from "@/components/Premium3DScene";
+import type { ArchiveChapter } from "@/components/Premium3DScene";
+import { artworkById, artworks, type Artwork } from "@/data/artworks";
 import { profile } from "@/data/profile";
 
-const navItems = [
-  { label: "Profile", href: "#profile" },
-  { label: "Systems", href: "#systems" },
-  { label: "Projects", href: "#projects" },
+const Premium3DScene = dynamic(() => import("@/components/Premium3DScene"), {
+  ssr: false,
+  loading: () => <div className="archive-scene archive-scene-loading" aria-hidden="true" />,
+});
+
+const chapters: Array<{ id: ArchiveChapter; label: string; mark: string }> = [
+  { id: "philosophy", label: "Philosophy", mark: "φ" },
+  { id: "history", label: "History", mark: "H" },
+  { id: "art", label: "Art", mark: "A" },
+  { id: "markets", label: "Quant finance", mark: "Q" },
+];
+
+const nav = [
+  { label: "Index", href: "#index" },
+  { label: "Inquiry", href: "#inquiry" },
+  { label: "Work", href: "#work" },
   { label: "Research", href: "#research" },
-  { label: "Endgame", href: "#endgame" },
+  { label: "Future", href: "#future" },
 ];
 
-const focusStats = [
-  { label: "Research Mode", value: "Quant + AI" },
-  { label: "Live Builds", value: String(profile.projects.filter((project) => project.details.status.includes("Live")).length) },
-  { label: "Validated Signals", value: "KO-PEP / MA-V" },
+const sourceLabels: Record<ArchiveChapter, string> = {
+  philosophy: "Two Men Contemplating the Moon / c. 1825 / The Met",
+  history: "Herodotos / 2nd century CE / The Met",
+  art: "Wheat Field with Cypresses / 1889 / The Met",
+  markets: "Venice from the Salute / c. 1835 / The Met",
+};
+
+const roomLabels = [
+  "Self-Portrait / Rembrandt",
+  "Two Men Contemplating the Moon / Friedrich",
+  "Washington Crossing the Delaware / Leutze",
+  "Wheat Field with Cypresses / Van Gogh",
+  "Venice from the Salute / Turner",
+  "The Death of Harmonia / Pierre",
+  "Young Woman with a Lute / Vermeer",
+  "Whalers / Turner",
 ];
 
-const studyLabels: Record<keyof typeof profile.currentAreasOfStudy, string> = {
-  quantitativeTrading: "Quantitative Trading",
-  mathematics: "Mathematics",
-  economics: "Economics",
-  technology: "Technology",
+const chapterTargets: Record<ArchiveChapter, string> = {
+  philosophy: "inquiry",
+  history: "history",
+  art: "art",
+  markets: "work",
 };
 
-const studyIcons = [ChartNoAxesCombined, Orbit, GraduationCap, Layers3];
-const researchIcons = [ShieldCheck, GraduationCap, ChartNoAxesCombined];
-const goalLabels: Record<keyof typeof profile.longTermGoals, string> = {
-  finance: "Finance",
-  academia: "Academia",
-  entrepreneurship: "Entrepreneurship",
-  publicService: "Public Service",
-};
-
-function SectionReveal({ children, className = "", id }: { children: ReactNode; className?: string; id?: string }) {
+function ChapterHeading({
+  label,
+  title,
+  className = "",
+}: {
+  label: string;
+  title: string;
+  className?: string;
+}) {
   return (
-    <motion.section
-      id={id}
-      initial={{ opacity: 0, y: 48, scale: 0.98 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: false, amount: 0.08 }}
-      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative z-10 mx-auto flex min-h-[88svh] w-full max-w-7xl items-start px-5 py-24 sm:px-8 md:min-h-screen md:items-center md:py-28 lg:px-10 ${className}`}
-    >
-      {children}
-    </motion.section>
-  );
-}
-
-function SectionIntro({ eyebrow, title, copy }: { eyebrow: string; title: string; copy?: string }) {
-  return (
-    <div className="max-w-3xl">
-      <p className="retro-kicker text-xs font-bold uppercase text-cyan-200/80">{eyebrow}</p>
-      <h2 className="retro-heading mt-4 text-4xl font-black leading-[1.02] text-white sm:text-5xl lg:text-7xl">
-        {title}
-      </h2>
-      {copy && <p className="mt-6 max-w-2xl text-base leading-8 text-slate-200/78 sm:text-lg">{copy}</p>}
+    <div className={className}>
+      <p className="archive-label">{label}</p>
+      <h2 className="archive-title">{title}</h2>
     </div>
   );
 }
 
+function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 44 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: false, amount: 0.16 }}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export default function Home() {
-  const [solarExplore, setSolarExplore] = useState(false);
+  const [activeChapter, setActiveChapter] = useState<ArchiveChapter>("philosophy");
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [journeyProgress, setJourneyProgress] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
 
-  useEffect(() => {
-    document.body.style.overflow = solarExplore ? "hidden" : "";
-    if (solarExplore) window.scrollTo({ top: 0, behavior: "smooth" });
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [solarExplore]);
+  const liveProjects = useMemo(() => profile.projects.filter((project) => project.liveUrl), []);
+  const closeArtwork = useCallback(() => setSelectedArtwork(null), []);
 
-  const handleEmptySpaceExplorePointer = (event: PointerEvent<HTMLElement>) => {
-    if (solarExplore) return;
-    if (event.pointerType !== "mouse") return;
-    const target = event.target as HTMLElement;
-    if (
-      target.closest(
-        "a, button, input, select, textarea, header, footer, article, h1, h2, h3, h4, p, span, svg, .premium-panel, [role='button'], [data-no-solar-explore]",
-      )
-    ) {
+  const goToSection = useCallback((sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    if (sectionId === "index") {
+      window.scrollTo({ behavior: "smooth", top: 0 });
       return;
     }
-    setSolarExplore(true);
-  };
+    const roomCenter = section.offsetTop + section.offsetHeight / 2;
+    const catalogueOffset = window.innerWidth < 760 ? -90 : 60;
+    window.scrollTo({
+      behavior: "smooth",
+      top: roomCenter - window.innerHeight / 2 - catalogueOffset,
+    });
+  }, []);
+
+  const goToChapter = useCallback((chapter: ArchiveChapter) => {
+    setActiveChapter(chapter);
+    goToSection(chapterTargets[chapter]);
+  }, [goToSection]);
+
+  const handleSectionLink = useCallback((event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    goToSection(href.slice(1));
+  }, [goToSection]);
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const maximum = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+      setScrollProgress(window.scrollY / maximum);
+
+      const candidates = Array.from(document.querySelectorAll<HTMLElement>("[data-archive-chapter]"));
+      const center = window.innerHeight * 0.5;
+      const closest = candidates.reduce<{ element: HTMLElement; distance: number } | null>((best, element) => {
+        const rect = element.getBoundingClientRect();
+        const distance = Math.abs(rect.top + rect.height / 2 - center);
+        return !best || distance < best.distance ? { element, distance } : best;
+      }, null);
+      const next = closest?.element.dataset.archiveChapter as ArchiveChapter | undefined;
+      if (next) setActiveChapter(next);
+
+      const sectionCenters = candidates.map((element) => {
+        const rect = element.getBoundingClientRect();
+        return window.scrollY + rect.top + rect.height / 2;
+      });
+      const pageCenter = window.scrollY + center;
+      let path = 0;
+      if (sectionCenters.length > 1) {
+        const segment = sectionCenters.findIndex((sectionCenter) => sectionCenter >= pageCenter);
+        if (segment === -1) path = 1;
+        else if (segment <= 0) path = 0;
+        else {
+          const previous = sectionCenters[segment - 1];
+          const following = sectionCenters[segment];
+          const local = (pageCenter - previous) / Math.max(following - previous, 1);
+          path = (segment - 1 + local) / (sectionCenters.length - 1);
+        }
+      }
+      setJourneyProgress(path);
+    };
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
 
   return (
-    <main onPointerDownCapture={handleEmptySpaceExplorePointer} className="relative min-h-screen overflow-x-hidden bg-black text-white">
-      <Premium3DScene exploreMode={solarExplore} onExploreChange={setSolarExplore} />
-      <motion.div
-        aria-hidden="true"
-        animate={{ opacity: solarExplore ? 0.18 : 1 }}
-        className="scanline-overlay pointer-events-none fixed inset-0 z-[1]"
+    <main className="archive-site">
+      <Premium3DScene
+        activeChapter={activeChapter}
+        scrollProgress={journeyProgress}
+        onChapterChange={goToChapter}
+        onArtworkSelect={(artworkId) => setSelectedArtwork(artworkById[artworkId] ?? null)}
       />
-      <motion.div
-        aria-hidden="true"
-        animate={{ opacity: solarExplore ? 0 : 1 }}
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-[1] h-48 bg-gradient-to-t from-black to-transparent"
-      />
+      <div className="archive-atmosphere" aria-hidden="true" />
 
-      <AnimatePresence>
-        {solarExplore && (
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.28 }}
-            className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-black/72 px-5 py-4 backdrop-blur-2xl sm:px-8 lg:px-10"
+      <header className="archive-header">
+        <a href="#index" className="archive-monogram" aria-label="Aditya Agrawal, return to top" onClick={(event) => handleSectionLink(event, "#index")}>
+          <span>AA</span>
+          <span className="archive-monogram-name">Aditya Agrawal</span>
+        </a>
+        <nav className="archive-nav" aria-label="Main navigation">
+          {nav.map((item) => <a key={item.href} href={item.href} onClick={(event) => handleSectionLink(event, item.href)}>{item.label}</a>)}
+        </nav>
+        <div className="archive-socials">
+          <a href={profile.socialLinks.x} target="_blank" rel="noreferrer" aria-label="Aditya on X">X</a>
+          <a href={profile.socialLinks.github} target="_blank" rel="noreferrer" aria-label="Aditya on GitHub"><Github size={17} /></a>
+          <button type="button" className="archive-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" aria-expanded={menuOpen}>
+            {menuOpen ? <X size={19} /> : <Menu size={19} />}
+          </button>
+        </div>
+      </header>
+
+      {menuOpen && (
+        <motion.nav
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="archive-mobile-nav"
+          aria-label="Mobile navigation"
+        >
+          {nav.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              onClick={(event) => {
+                setMenuOpen(false);
+                handleSectionLink(event, item.href);
+              }}
+            >
+              {item.label}
+            </a>
+          ))}
+        </motion.nav>
+      )}
+
+      <aside className="chapter-rail" aria-label="Explore the four disciplines">
+        {chapters.map((chapter) => (
+          <button
+            key={chapter.id}
+            type="button"
+            onClick={() => goToChapter(chapter.id)}
+            className={activeChapter === chapter.id ? "is-active" : ""}
+            aria-pressed={activeChapter === chapter.id}
+            aria-label={`Open ${chapter.label} chapter`}
           >
-            <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-              <div>
-                <p className="retro-kicker text-[10px] font-black uppercase text-cyan-200">Solar System Explorer</p>
-                <p className="mt-1 hidden text-xs text-slate-300 sm:block">Drag to rotate, scroll to zoom, click a planet to focus.</p>
-              </div>
-              <div className="hidden items-center gap-3 text-xs font-bold text-slate-300 md:flex">
-                <span className="inline-flex items-center gap-1.5"><MousePointer2 size={14} /> Click planets</span>
-                <span className="inline-flex items-center gap-1.5"><RotateCcw size={14} /> Drag view</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSolarExplore(false)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/12 bg-white/[0.08] text-white transition hover:border-cyan-200/45 hover:bg-cyan-200/10"
-                aria-label="Exit solar system explorer"
-              >
-                <X size={18} />
-              </button>
-            </div>
+            <span className="chapter-mark">{chapter.mark}</span>
+            <span>{chapter.label}</span>
+          </button>
+        ))}
+      </aside>
+
+      <div className="archive-progress" aria-hidden="true"><span style={{ transform: `scaleX(${scrollProgress})` }} /></div>
+      <div className="museum-location" aria-hidden="true">
+        <span>Room {String(Math.min(7, Math.round(journeyProgress * 7)) + 1).padStart(2, "0")} / 08</span>
+        <span className="museum-location-line" />
+        <span>{journeyProgress < 0.035 ? "Scroll to walk" : roomLabels[Math.min(7, Math.round(journeyProgress * 7))]}</span>
+      </div>
+
+      <section id="index" className="archive-section archive-hero" data-archive-chapter="philosophy">
+        <div className="archive-content hero-copy">
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="archive-label">
+            Personal museum / eight rooms of inquiry
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 34 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            Aditya<br /><i>Agrawal</i>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.16 }}
+            className="hero-thesis"
+          >
+            I study the forces behind choice, civilization, beauty, and price.
+          </motion.p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="hero-actions">
+            <a href="#work" onClick={(event) => handleSectionLink(event, "#work")}>Selected work <ArrowDown size={16} /></a>
+            <button type="button" onClick={() => goToChapter("philosophy")}>Enter the gallery <ArrowUpRight size={16} /></button>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {!solarExplore && (
-          <motion.header
-            initial={{ opacity: 1, y: 0 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -18 }}
-            transition={{ duration: 0.35 }}
-            className="fixed left-0 right-0 top-0 z-40 border-b border-white/10 bg-black/62 backdrop-blur-2xl"
+          <button
+            type="button"
+            className="hero-artwork-link"
+            onClick={() => setSelectedArtwork(artworks[0])}
+            aria-label="Inspect Self-Portrait by Rembrandt van Rijn"
           >
-            <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8 lg:px-10">
-          <a href="#top" className="group flex items-center gap-3">
-            <span className="retro-heading grid h-10 w-10 place-items-center rounded-lg border border-white/15 bg-white/10 text-sm font-black text-white shadow-[0_0_36px_rgba(98,168,255,0.24)]">
-              AA
-            </span>
-            <span className="hidden text-sm font-bold text-white/90 transition group-hover:text-white sm:block">{profile.name}</span>
-          </a>
+            <span>On view</span>
+            <strong>Self-Portrait / Rembrandt / 1660</strong>
+            <ArrowUpRight size={14} />
+          </button>
+        </div>
+        <p className="scene-caption">{sourceLabels[activeChapter]}</p>
+      </section>
 
-          <div className="hidden items-center gap-1 rounded-lg border border-white/10 bg-white/[0.06] p-1 lg:flex">
-            {navItems.map((item) => (
-              <a key={item.href} href={item.href} className="rounded-md px-4 py-2 text-xs font-bold uppercase text-slate-300 transition hover:bg-white/10 hover:text-white">
-                {item.label}
-              </a>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <a href={profile.socialLinks.x} target="_blank" rel="noreferrer" aria-label="Open Aditya's X profile" className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 bg-white/[0.08] text-sm font-black text-white transition hover:border-cyan-300/50 hover:bg-cyan-300/10">
-              X
-            </a>
-            <a href={profile.socialLinks.github} target="_blank" rel="noreferrer" aria-label="Open Aditya's GitHub profile" className="grid h-10 w-10 place-items-center rounded-lg border border-white/10 bg-white/[0.08] text-white transition hover:border-cyan-300/50 hover:bg-cyan-300/10">
-              <Github size={18} />
-            </a>
-            <a href="#projects" className="hidden items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-black text-slate-950 transition hover:bg-cyan-100 sm:inline-flex">
-              Work
-              <ArrowUpRight size={16} />
-            </a>
-          </div>
-            </nav>
-          </motion.header>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {!solarExplore && (
-          <motion.div
-            initial={{ opacity: 1, scale: 1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.985 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <SectionReveal id="top" className="pt-36">
-          <div className="grid w-full gap-12 lg:grid-cols-[1.04fr_0.96fr] lg:items-center">
-          <div>
-            <motion.h1
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="retro-heading max-w-5xl text-5xl font-black leading-[0.96] text-white sm:text-7xl lg:text-8xl"
-            >
-              {profile.name}
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 22 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, delay: 0.16 }}
-              className="mt-7 max-w-2xl text-xl font-semibold leading-8 text-slate-100 sm:text-2xl"
-            >
-              {profile.tagline}
-            </motion.p>
-            <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">{profile.subtitle}</p>
-
-            <div className="mt-9 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => setSolarExplore(true)}
-                className="inline-flex items-center gap-2 rounded-lg bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950 shadow-[0_18px_55px_rgba(34,211,238,0.22)] transition hover:bg-white"
-              >
-                Enter Orbit
-                <ArrowDown size={17} />
-              </button>
-              <a href="#projects" className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/[0.08] px-5 py-3 text-sm font-black text-white backdrop-blur transition hover:border-white/30 hover:bg-white/12">
-                See Projects
-                <ArrowUpRight size={17} />
-              </a>
-            </div>
-          </div>
-
-          <aside className="premium-panel p-6 sm:p-7">
-            <div className="flex items-start justify-between gap-6">
-              <div>
-                <p className="retro-kicker text-xs font-black uppercase text-slate-400">Current Orbit</p>
-                <h2 className="retro-heading mt-3 text-3xl font-black text-white">Research-driven builder</h2>
-              </div>
-              <Bot className="text-cyan-200" size={30} />
-            </div>
-            <p className="mt-5 text-sm leading-7 text-slate-300">
-              Building at the intersection of mathematics, financial markets, AI, insurance, and entrepreneurship.
+      <section id="inquiry" className="archive-section inquiry-section" data-archive-chapter="philosophy">
+        <div className="archive-content inquiry-copy">
+          <Reveal>
+            <ChapterHeading label="Inquiry / Philosophy" title="Questions before answers." />
+            <p className="lead-copy">
+              My work begins with a philosophical habit: challenge the premise, define what can be known, then build a model that survives contact with reality.
             </p>
-            <div className="mt-7 grid gap-3">
-              {focusStats.map((stat) => (
-                <div key={stat.label} className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.06] px-4 py-3">
-                  <span className="text-sm text-slate-400">{stat.label}</span>
-                  <span className="text-sm font-black text-white">{stat.value}</span>
-                </div>
-              ))}
-            </div>
-          </aside>
-          </div>
-        </SectionReveal>
-
-        <SectionReveal id="profile">
-        <div className="grid w-full gap-10 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
-          <SectionIntro eyebrow="Profile" title="What I am building toward." />
-          <div className="premium-panel space-y-5 p-6 sm:p-8">
-            {profile.about.split("\n\n").map((paragraph) => (
-              <p key={paragraph} className="text-base leading-8 text-slate-200/82">{paragraph}</p>
-            ))}
-            <blockquote className="rounded-lg border border-cyan-200/18 bg-cyan-200/[0.07] p-5 text-base leading-8 text-cyan-50">
-              {profile.philosophy}
-            </blockquote>
-          </div>
+          </Reveal>
+          <ArtworkPlaque artwork={artworks[1]} onInspect={setSelectedArtwork} />
         </div>
-        </SectionReveal>
+      </section>
 
-        <SectionReveal id="systems">
-        <div className="w-full">
-          <SectionIntro
-            eyebrow="Systems"
-            title="The disciplines powering the work."
-            copy="Each area feeds the same loop: research a system, model its behavior, build tools, test assumptions, and compound the feedback."
-          />
-          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {Object.entries(profile.currentAreasOfStudy).map(([key, topics], index) => {
-              const Icon = studyIcons[index] ?? Target;
-              return (
-                <article key={key} className="premium-panel group p-5 transition duration-500 hover:-translate-y-2 hover:border-cyan-200/35 hover:bg-white/[0.09]">
-                  <Icon className="text-cyan-200" size={24} />
-                  <h3 className="retro-heading mt-5 text-xl font-black text-white">{studyLabels[key as keyof typeof profile.currentAreasOfStudy]}</h3>
-                  <ul className="mt-5 space-y-2.5">
-                    {topics.slice(0, 5).map((topic) => (
-                      <li key={topic} className="flex gap-2 text-sm leading-6 text-slate-300">
-                        <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-300" />
-                        <span>{topic}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              );
-            })}
-          </div>
+      <section id="history" className="archive-section history-section" data-archive-chapter="history">
+        <div className="archive-content history-copy">
+          <Reveal>
+            <ChapterHeading label="Context / History" title="Every system has a memory." />
+            <p className="lead-copy">
+              History turns abstract incentives into evidence. It is where institutions, shocks, ambition, and human judgment reveal what a clean theory leaves out.
+            </p>
+          </Reveal>
+          <ArtworkPlaque artwork={artworks[2]} onInspect={setSelectedArtwork} />
         </div>
-        </SectionReveal>
+      </section>
 
-        <SectionReveal id="projects">
-        <div className="w-full">
-          <SectionIntro eyebrow="Portfolio" title="Projects with a research engine underneath." />
-          <div className="mt-10 grid gap-5 lg:grid-cols-2">
-            {profile.projects.map((project, index) => (
-              <motion.article
+      <section id="art" className="archive-section art-section" data-archive-chapter="art">
+        <div className="archive-content art-copy">
+          <Reveal>
+            <ChapterHeading label="Attention / Art" title="Form makes thought visible." />
+            <p className="lead-copy">
+              Art is a discipline of attention. Composition, tension, and restraint can make complexity felt before it is explained, a useful lesson for research and software alike.
+            </p>
+          </Reveal>
+          <ArtworkPlaque artwork={artworks[3]} onInspect={setSelectedArtwork} />
+        </div>
+      </section>
+
+      <section id="work" className="archive-section work-section" data-archive-chapter="markets">
+        <div className="archive-content work-copy">
+          <Reveal>
+            <ChapterHeading label="Practice / Quant finance" title="Models, tools, and live experiments." />
+            <p className="lead-copy">
+              I build at the intersection of quantitative finance, mathematics, AI, and market structure, with a bias toward research that can become a working system.
+            </p>
+          </Reveal>
+          <ArtworkPlaque artwork={artworks[4]} onInspect={setSelectedArtwork} />
+        </div>
+      </section>
+
+      <section id="projects" className="archive-section project-section">
+        <div className="archive-content work-copy">
+          <Reveal>
+            <ChapterHeading label="Cases on file / Personal work" title="Selected work, currently live." />
+          </Reveal>
+          <div className="project-ledger">
+            {liveProjects.map((project, index) => (
+              <motion.a
                 key={project.id}
-                initial={{ opacity: 0, y: 26 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.55, delay: Math.min(index * 0.05, 0.2) }}
-                className="premium-panel group p-6 transition duration-500 hover:-translate-y-2 hover:border-white/25 hover:bg-white/[0.095]"
+                href={project.liveUrl}
+                target="_blank"
+                rel="noreferrer"
+                initial={{ opacity: 0, x: -28 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{ duration: 0.6, delay: Math.min(index * 0.055, 0.22) }}
+                className="project-entry"
               >
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
-                    <p className="retro-kicker text-xs font-black uppercase text-cyan-200/80">{project.category}</p>
-                    <h3 className="retro-heading mt-3 text-2xl font-black text-white">{project.title}</h3>
-                    <p className="mt-2 text-sm font-bold text-slate-300">{project.tagline}</p>
-                  </div>
-                  <span className="rounded-md border border-white/12 bg-white/[0.08] px-3 py-1.5 text-xs font-black text-slate-300">{project.details.status}</span>
-                </div>
-
-                <p className="mt-5 text-sm leading-7 text-slate-300">{project.details.overview}</p>
-
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {project.details.tech.map((tech) => (
-                    <span key={tech} className="rounded-md border border-white/10 bg-white/[0.07] px-3 py-1 text-xs font-bold text-slate-300">{tech}</span>
-                  ))}
-                </div>
-
-                {"results" in project.details && project.details.results && (
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    {project.details.results.map((result) => (
-                      <div key={result.pair} className="rounded-lg border border-cyan-200/15 bg-cyan-200/[0.07] px-4 py-2 text-sm">
-                        <span className="font-black text-white">{result.pair}</span>
-                        <span className="ml-2 text-cyan-100/75">Sharpe {result.sharpe}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {project.liveUrl && (
-                  <a href={project.liveUrl} target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-black text-slate-950 transition hover:bg-cyan-200">
-                    Visit Project
-                    <ExternalLink size={15} />
-                  </a>
-                )}
-              </motion.article>
+                <span className="project-number">{String(index + 1).padStart(2, "0")}</span>
+                <span className="project-main">
+                  <strong>{project.title}</strong>
+                  <small>{project.summary}</small>
+                </span>
+                <span className="project-category">{project.category}</span>
+                <ArrowUpRight size={18} />
+              </motion.a>
             ))}
           </div>
         </div>
-        </SectionReveal>
+      </section>
 
-        <SectionReveal id="research">
-        <div className="w-full">
-          <SectionIntro eyebrow="Research" title="Markets, resilience, and complex systems." />
-          <div className="mt-10 grid gap-5 lg:grid-cols-3">
-            {profile.researchAreas.map((area, index) => {
-              const Icon = researchIcons[index] ?? Target;
-              return (
-                <article key={area.title} className="premium-panel p-6">
-                  <Icon className="text-emerald-300" size={26} />
-                  <h3 className="retro-heading mt-5 text-2xl font-black text-white">{area.title}</h3>
-                  <p className="mt-4 text-sm leading-7 text-slate-300">{area.description}</p>
-                </article>
-              );
-            })}
-          </div>
+      <section id="research" className="archive-section research-section" data-archive-chapter="history">
+        <div className="archive-content research-copy">
+          <Reveal>
+            <ChapterHeading label="Research / Applied systems" title="Risk is where disciplines meet." />
+            <p className="lead-copy">I study how uncertainty travels through insurance, markets, institutions, and the systems people depend on.</p>
+          </Reveal>
+          <ArtworkPlaque artwork={artworks[5]} onInspect={setSelectedArtwork} />
         </div>
-        </SectionReveal>
+      </section>
 
-        <SectionReveal id="endgame">
-        <div className="grid w-full gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
-          <SectionIntro
-            eyebrow="Endgame"
-            title="Long-term direction."
-            copy="The destination is not just a better portfolio site. It is a body of work strong enough to support serious research, durable software, and eventually a world-class quantitative investment firm."
-          />
-          <div className="grid gap-4 sm:grid-cols-2">
-            {Object.entries(profile.longTermGoals).map(([key, goals]) => (
-              <div key={key} className="premium-panel p-5">
-                <h3 className="retro-kicker text-sm font-black uppercase text-cyan-200">{goalLabels[key as keyof typeof profile.longTermGoals]}</h3>
-                <ul className="mt-5 space-y-3">
-                  {goals.map((goal) => (
-                    <li key={goal} className="flex gap-3 text-sm leading-6 text-slate-300">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-300" />
-                      <span>{goal}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+      <section id="research-notes" className="archive-section research-notes-section">
+        <div className="archive-content research-copy">
+          <Reveal><ChapterHeading label="Research notes / Current questions" title="Where the inquiry continues." /></Reveal>
+          <div className="research-lines">
+            {profile.researchAreas.map((area, index) => (
+              <Reveal key={area.title} delay={index * 0.07} className="research-line">
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <h3>{area.title}</h3>
+                <p>{area.description}</p>
+              </Reveal>
             ))}
           </div>
         </div>
-        </SectionReveal>
+      </section>
 
-        <footer className="relative z-10 border-t border-white/10 bg-black/70 px-5 py-8 backdrop-blur-xl sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} {profile.name}. Built as an interactive research portfolio.</p>
-          <div className="flex flex-wrap items-center gap-4">
-            <a href={profile.socialLinks.x} target="_blank" rel="noreferrer" className="font-black text-white transition hover:text-cyan-200">X</a>
-            <a href={profile.socialLinks.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 font-black text-white transition hover:text-cyan-200">
-              GitHub
-              <Github size={15} />
-            </a>
-          </div>
+      <section id="future" className="archive-section future-section" data-archive-chapter="philosophy">
+        <div className="archive-content future-copy">
+          <Reveal>
+            <ChapterHeading label="Trajectory / The unfinished index" title="Research, enterprise, public consequence." />
+            <p className="lead-copy">I want the next room to hold ambitious research, durable businesses, and systems whose usefulness reaches beyond the model.</p>
+          </Reveal>
+          <ArtworkPlaque artwork={artworks[6]} onInspect={setSelectedArtwork} />
         </div>
-            </footer>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </section>
 
-      {!solarExplore && <DigitalTwinChat />}
+      <section id="about" className="archive-section about-section" data-archive-chapter="art">
+        <div className="archive-content future-copy">
+          <Reveal>
+            <ChapterHeading label="Closing room / Personal direction" title="The work remains unfinished." />
+          </Reveal>
+          <Reveal delay={0.08} className="future-statement">
+            <p>{profile.about.split("\n\n")[1]}</p>
+            <div className="future-links">
+              <a href={profile.socialLinks.github} target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={16} /></a>
+              <a href={profile.socialLinks.x} target="_blank" rel="noreferrer">X / @aditya_quant <ArrowUpRight size={16} /></a>
+            </div>
+          </Reveal>
+          <ArtworkPlaque artwork={artworks[7]} onInspect={setSelectedArtwork} />
+          <footer className="archive-footer">
+            <span>Aditya Agrawal</span>
+            <span>Quantitative research / mathematics / ideas</span>
+            <a href="#index" onClick={(event) => handleSectionLink(event, "#index")}>Return to index</a>
+          </footer>
+        </div>
+      </section>
+
+      <DigitalTwinChat />
+      <ArtworkInspector artwork={selectedArtwork} onClose={closeArtwork} />
     </main>
   );
 }
