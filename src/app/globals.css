@@ -400,18 +400,22 @@ button { color: inherit; }
   padding-bottom: 5rem;
 }
 .hero-copy {
-  width: min(34rem, 38vw);
-  padding: 1.4rem 2.4rem 1.5rem 0;
+  width: min(29rem, 34vw);
+  padding: 0;
   border: 0;
-  background: linear-gradient(90deg, rgba(222, 209, 185, 0.9), rgba(222, 209, 185, 0.64) 72%, transparent);
+  background: transparent;
   box-shadow: none;
   backdrop-filter: none;
+}
+.hero-intro {
+  padding: 1.2rem 2rem 1.25rem 0;
+  background: linear-gradient(90deg, rgba(222, 209, 185, 0.82), rgba(222, 209, 185, 0.48) 72%, transparent);
 }
 .hero-copy h1 {
   margin: 0.9rem 0 0;
   color: var(--archive-ink);
   font-family: var(--font-cormorant), serif;
-  font-size: clamp(4.25rem, 6.6vw, 6.8rem);
+  font-size: clamp(4.1rem, 6.1vw, 6.45rem);
   font-weight: 500;
   line-height: 0.79;
 }
@@ -737,6 +741,20 @@ button { color: inherit; }
   font: 500 0.54rem/1.4 var(--font-plex-mono), monospace;
   text-transform: uppercase;
 }
+.artwork-plaque-facts > span {
+  display: grid;
+  gap: 0.25rem;
+  align-content: start;
+}
+.artwork-plaque-facts > span + span {
+  padding-left: 0.8rem;
+  border-left: 1px solid rgba(54, 58, 54, 0.2);
+}
+.artwork-plaque-facts small {
+  color: #7a684a;
+  font: 600 0.49rem/1.2 var(--font-plex-mono), monospace;
+  text-transform: uppercase;
+}
 .artwork-plaque-reason {
   margin-top: 0.4rem;
   color: #354043;
@@ -744,16 +762,37 @@ button { color: inherit; }
   line-height: 1.52;
 }
 .artwork-plaque-hero {
-  width: min(28rem, 100%);
-  margin-top: 1.25rem;
+  width: min(27rem, 100%);
+  gap: 0.22rem;
+  margin-top: 1rem;
+  padding: 0.8rem 0.95rem 0.78rem 1.25rem;
   background: rgba(217, 204, 180, 0.94);
 }
+.artwork-plaque-hero strong { font-size: 1.18rem; }
+.artwork-plaque-hero .artwork-plaque-facts { margin-top: 0.25rem; padding: 0.36rem 0; }
+.artwork-plaque-hero .artwork-plaque-reason {
+  overflow: hidden;
+  margin-top: 0.25rem;
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.artwork-plaque-hero .artwork-plaque-action { margin-top: 0.2rem; }
 .artwork-plaque-action {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   margin-top: 0.35rem;
   color: var(--archive-oxblood);
+}
+
+@media (min-width: 761px) and (max-height: 780px) {
+  .archive-hero { padding-top: calc(var(--header-height) + 1.5rem); }
+  .hero-copy h1 { margin-top: 0.55rem; font-size: clamp(4rem, 5.65vw, 5.2rem); line-height: 0.8; }
+  .hero-thesis { margin-top: 1rem; font-size: clamp(1.1rem, 1.35vw, 1.35rem); }
+  .hero-actions { margin-top: 0.9rem; }
+  .hero-intro { padding-top: 0.85rem; padding-bottom: 0.9rem; }
+  .artwork-plaque-hero { margin-top: 0.8rem; }
 }
 
 .artwork-inspector-backdrop {
@@ -888,17 +927,27 @@ button { color: inherit; }
   .chapter-rail button,
   .chapter-rail button:hover,
   .chapter-rail button.is-active {
-    grid-template-columns: 2.55rem;
-    min-width: 2.75rem;
+    grid-template-columns: auto minmax(0, 1fr);
+    flex: 1 1 0;
+    gap: 0.22rem;
+    min-width: 0;
     min-height: 2.75rem;
-    padding: 0;
+    padding: 0 0.38rem;
     border-color: var(--archive-line);
     background: rgba(215, 202, 177, 0.9);
-    color: transparent;
+    color: #303b3d;
+    transform: none;
   }
   .chapter-rail button.is-active { border-color: var(--archive-gilt); background: #e6d7bc; }
-  .chapter-rail button > span:last-child { display: none; }
-  .chapter-mark { width: 2.55rem; height: 2.55rem; }
+  .chapter-mark { width: auto; height: 2.55rem; font-size: 0.5rem; }
+  .chapter-name {
+    display: block;
+    overflow: hidden;
+    font-size: 0.47rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .archive-site > button[aria-label*="digital twin"] { right: 0.75rem; bottom: 0.75rem; }
   .archive-section {
     min-height: 190svh;
@@ -920,12 +969,14 @@ button { color: inherit; }
     box-shadow: -1rem 1rem 3rem rgba(92, 73, 52, 0.12);
     backdrop-filter: blur(7px);
   }
-  .hero-copy { padding: 1.3rem 1.1rem 1.4rem 0; border-left: 0; background: linear-gradient(90deg, rgba(211, 199, 177, 0.93), rgba(211, 199, 177, 0.68) 82%, transparent); }
+  .hero-copy { padding: 0; border-left: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
+  .hero-intro { padding: 1.2rem 1rem 1.25rem 0; background: linear-gradient(90deg, rgba(211, 199, 177, 0.88), rgba(211, 199, 177, 0.56) 82%, transparent); }
   .hero-copy h1 { font-size: clamp(3.75rem, 18vw, 5rem); line-height: 0.8; }
   .hero-thesis { max-width: 18rem; margin-top: 1.45rem; font-size: 1.28rem; }
   .hero-actions { gap: 1rem 1.4rem; margin-top: 1.35rem; }
   .hero-artwork-link { margin-top: 1rem; }
   .artwork-plaque-hero { margin-top: 1.1rem; }
+  .artwork-plaque-hero .artwork-plaque-reason { white-space: normal; }
   .archive-title { max-width: 10ch; font-size: clamp(3rem, 13vw, 4.25rem); }
   .lead-copy { font-size: 0.94rem; line-height: 1.58; }
   .scene-caption { display: none; }

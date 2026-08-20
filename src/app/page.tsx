@@ -20,7 +20,7 @@ const chapters: Array<{ id: ArchiveChapter; label: string; mark: string }> = [
   { id: "philosophy", label: "Philosophy", mark: "01" },
   { id: "history", label: "History", mark: "02" },
   { id: "art", label: "Art", mark: "03" },
-  { id: "markets", label: "Quant finance", mark: "04" },
+  { id: "markets", label: "Quant", mark: "04" },
 ];
 
 const nav = [
@@ -262,7 +262,7 @@ export default function Home() {
             aria-label={`Open ${chapter.label} chapter`}
           >
             <span className="chapter-mark">{chapter.mark}</span>
-            <span>{chapter.label}</span>
+            <span className="chapter-name">{chapter.label}</span>
           </button>
         ))}
       </aside>
@@ -276,28 +276,30 @@ export default function Home() {
 
       <section id="index" className="archive-section archive-hero" data-archive-chapter="philosophy">
         <div className="archive-content hero-copy">
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="archive-label">
-            Personal museum / eight rooms of inquiry
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 34 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          >
-            Aditya<br /><i>Agrawal</i>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.16 }}
-            className="hero-thesis"
-          >
-            I study the forces behind choice, civilization, beauty, and price.
-          </motion.p>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="hero-actions">
-            <a href="#work" onClick={(event) => handleSectionLink(event, "#work")}>Selected work <ArrowDown size={16} /></a>
-            <button type="button" onClick={() => goToChapter("philosophy")}>Enter the gallery <ArrowUpRight size={16} /></button>
-          </motion.div>
+          <div className="hero-intro">
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="archive-label">
+              Personal museum / eight rooms of inquiry
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 34 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            >
+              Aditya<br /><i>Agrawal</i>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.16 }}
+              className="hero-thesis"
+            >
+              I study the forces behind choice, civilization, beauty, and price.
+            </motion.p>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="hero-actions">
+              <a href="#work" onClick={(event) => handleSectionLink(event, "#work")}>Selected work <ArrowDown size={16} /></a>
+              <button type="button" onClick={() => goToChapter("philosophy")}>Enter the gallery <ArrowUpRight size={16} /></button>
+            </motion.div>
+          </div>
           <ArtworkPlaque artwork={artworks[0]} onInspect={setSelectedArtwork} variant="hero" />
         </div>
         <p className="scene-caption">{sourceLabels[activeChapter]}</p>

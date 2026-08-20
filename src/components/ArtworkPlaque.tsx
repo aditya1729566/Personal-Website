@@ -21,8 +21,8 @@ export function ArtworkPlaque({
       <strong>{artwork.title}</strong>
       <span className="artwork-plaque-credit">{artwork.artist} · {artwork.year}</span>
       <span className="artwork-plaque-facts">
-        <span>{artwork.medium}</span>
-        <span>{artwork.collection}</span>
+        <span><small>Medium</small>{artwork.medium}</span>
+        <span><small>Collection</small>{artwork.collection}</span>
       </span>
       <span className="artwork-plaque-reason">{artwork.connection}</span>
       <span className="artwork-plaque-action">Inspect work <Maximize2 size={13} /></span>

@@ -60,8 +60,8 @@ function fitText(context: CanvasRenderingContext2D, text: string, maxWidth: numb
 function createLabelTexture(exhibit: Exhibit) {
   const artwork = exhibit.artworkId ? artworkById[exhibit.artworkId] : undefined;
   const canvas = document.createElement("canvas");
-  canvas.width = 1600;
-  canvas.height = 440;
+  canvas.width = 1800;
+  canvas.height = 300;
   const context = canvas.getContext("2d");
   if (!context) return null;
   context.fillStyle = "#d8ccb5";
@@ -71,26 +71,27 @@ function createLabelTexture(exhibit: Exhibit) {
   context.fillStyle = "#483326";
   context.fillRect(18, 0, canvas.width - 18, 8);
   context.fillStyle = "#6f5732";
-  context.font = "600 28px monospace";
-  context.fillText(`ON VIEW / ${(artwork?.room ?? exhibit.chapter).toUpperCase()}`, 72, 70);
+  context.font = "600 27px monospace";
+  context.fillText(`ON VIEW / ${(artwork?.room ?? exhibit.chapter).toUpperCase()}`, 72, 48);
   context.fillStyle = "#202a2d";
-  fitText(context, artwork?.title ?? exhibit.title, 1450, 68, 600);
-  context.fillText(artwork?.title ?? exhibit.title, 72, 158);
+  fitText(context, artwork?.title ?? exhibit.title, 1650, 68, 600);
+  context.fillText(artwork?.title ?? exhibit.title, 72, 116);
   context.fillStyle = "#3c4748";
-  context.font = "500 35px Georgia, serif";
-  context.fillText(`${artwork?.artist ?? "Personal collection"} · ${artwork?.year ?? ""}`, 72, 218, 1450);
+  context.font = "500 34px Georgia, serif";
+  context.fillText(`${artwork?.artist ?? "Personal collection"} · ${artwork?.year ?? ""}`, 72, 161, 1650);
   context.strokeStyle = "rgba(54, 58, 54, 0.24)";
   context.beginPath();
-  context.moveTo(72, 252);
-  context.lineTo(1528, 252);
+  context.moveTo(72, 188);
+  context.lineTo(1728, 188);
   context.stroke();
   context.fillStyle = "#4f5855";
-  context.font = "500 24px monospace";
-  context.fillText(artwork?.medium?.toUpperCase() ?? "OPEN ACCESS IMAGE", 72, 302, 660);
-  context.fillText((artwork?.collection ?? "THE PERSONAL COLLECTION").toUpperCase(), 790, 302, 738);
-  context.fillStyle = "#354043";
-  context.font = "400 28px Georgia, serif";
-  context.fillText(artwork?.connection ?? "A work in Aditya Agrawal's personal museum.", 72, 372, 1450);
+  context.font = "600 21px monospace";
+  context.fillText("MEDIUM", 72, 224);
+  context.fillText("COLLECTION", 850, 224);
+  context.fillStyle = "#293437";
+  context.font = "500 26px Georgia, serif";
+  context.fillText(artwork?.medium ?? "Open access image", 72, 264, 690);
+  context.fillText(artwork?.collection ?? "The personal collection", 850, 264, 878);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 8;
@@ -103,6 +104,7 @@ function createFrame(
   raycastTargets: THREE.Mesh[],
   frameMaterials: THREE.MeshStandardMaterial[],
   createdTextures: THREE.Texture[],
+  plaqueSprites: THREE.Sprite[],
 ) {
   const group = new THREE.Group();
   group.userData.chapter = exhibit.chapter;
@@ -155,12 +157,12 @@ function createFrame(
   const titleTexture = createLabelTexture(exhibit);
   if (titleTexture) {
     createdTextures.push(titleTexture);
-    const plaque = new THREE.Mesh(
-      new THREE.PlaneGeometry(Math.min(Math.max(exhibit.width, 3.1), 4.15), 0.94),
-      new THREE.MeshBasicMaterial({ map: titleTexture }),
-    );
-    plaque.position.set(0, -exhibit.height / 2 - 0.72, 0.11);
+    const plaque = new THREE.Sprite(new THREE.SpriteMaterial({ map: titleTexture, depthTest: false, depthWrite: false }));
+    plaque.scale.set(3.5, 0.62, 1);
+    plaque.position.set(0, -exhibit.height / 2 - 0.9, 0.18);
+    plaque.renderOrder = 8;
     group.add(plaque);
+    plaqueSprites.push(plaque);
   }
   return group;
 }
@@ -350,21 +352,32 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
 
     const raycastTargets: THREE.Mesh[] = [];
     const frames: THREE.Group[] = [];
+    const plaqueSprites: THREE.Sprite[] = [];
     const frameMaterials: THREE.MeshStandardMaterial[] = [];
-    exhibits.forEach((exhibit) => {
+    exhibits.forEach((exhibit, index) => {
       const texture = exhibit.texture ?? textureLoader.load(exhibit.image ?? "", (loaded) => {
         loaded.colorSpace = THREE.SRGBColorSpace;
         loaded.anisotropy = renderer.capabilities.getMaxAnisotropy();
       });
       if (!createdTextures.includes(texture)) createdTextures.push(texture);
-      const frame = createFrame(texture, exhibit, raycastTargets, frameMaterials, createdTextures);
+      const frame = createFrame(texture, exhibit, raycastTargets, frameMaterials, createdTextures, plaqueSprites);
       const side = exhibit.side === "right" ? 1 : exhibit.side === "left" ? -1 : 0;
       frame.position.set(side * 5.74, 1.34, exhibit.z);
       frame.rotation.y = side * -Math.PI / 2;
+      frame.rotation.z = Math.sin(index * 1.73) * 0.0032;
       gallery.add(frame);
+      const plaque = plaqueSprites[plaqueSprites.length - 1];
+      if (plaque?.parent === frame) {
+        gallery.attach(plaque);
+        // Camera-facing labels need a slight outward offset to sit visually
+        // beneath paintings mounted on the corridor's side walls.
+        if (side > 0) plaque.position.x = 6.05;
+        if (side < 0) plaque.position.x = -6.82;
+        else plaque.position.z = exhibit.z + 0.48;
+      }
       frames.push(frame);
 
-      const spot = new THREE.SpotLight(0xffc982, exhibit.artworkId ? 72 : 42, 15, Math.PI / 5.2, 0.7, 1.55);
+      const spot = new THREE.SpotLight(index % 2 ? 0xffcf91 : 0xffc47b, (exhibit.artworkId ? 70 : 42) + (index % 3) * 2.5, 15, Math.PI / 5.2, 0.7, 1.55);
       spot.position.set(side * 4.25, 4.3, exhibit.z + (exhibit.side === "end" ? 4.2 : 1.25));
       spot.target.position.set(side * 5.6, 1.15, exhibit.z);
       spot.castShadow = false;
@@ -465,7 +478,6 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
       lookTarget.y = THREE.MathUtils.damp(lookTarget.y, desiredLookTarget.y, reducedMotion ? 16 : 5.2, delta);
       lookTarget.z = THREE.MathUtils.damp(lookTarget.z, desiredLookTarget.z, reducedMotion ? 16 : 5.2, delta);
       camera.lookAt(lookTarget);
-
       raycaster.setFromCamera(smoothPointer, camera);
       const hit = raycaster.intersectObjects(raycastTargets, false)[0];
       hovered = hit?.object instanceof THREE.Mesh ? hit.object : null;
@@ -502,6 +514,7 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
           const materials = Array.isArray(object.material) ? object.material : [object.material];
           materials.forEach((material) => material.dispose());
         }
+        if (object instanceof THREE.Sprite) object.material.dispose();
       });
       dustGeometry.dispose();
       renderer.dispose();
