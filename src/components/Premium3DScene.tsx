@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
+import { artworkById } from "@/data/artworks";
+
 export type ArchiveChapter = "philosophy" | "history" | "art" | "markets";
 
 type MuseumSceneProps = {
@@ -10,6 +12,7 @@ type MuseumSceneProps = {
   scrollProgress: number;
   onChapterChange: (chapter: ArchiveChapter) => void;
   onArtworkSelect: (artworkId: string) => void;
+  onReady: () => void;
 };
 
 type Exhibit = {
@@ -24,22 +27,70 @@ type Exhibit = {
   artworkId?: string;
 };
 
-function createLabelTexture(title: string) {
+function createSurfaceTexture(size = 256) {
   const canvas = document.createElement("canvas");
-  canvas.width = 1200;
-  canvas.height = 240;
+  canvas.width = size;
+  canvas.height = size;
   const context = canvas.getContext("2d");
   if (!context) return null;
-  context.fillStyle = "#cfc2aa";
+  const image = context.createImageData(size, size);
+  for (let index = 0; index < image.data.length; index += 4) {
+    const value = 118 + Math.floor(Math.random() * 34);
+    image.data[index] = value;
+    image.data[index + 1] = value;
+    image.data[index + 2] = value;
+    image.data[index + 3] = 255;
+  }
+  context.putImageData(image, 0, 0);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  return texture;
+}
+
+function fitText(context: CanvasRenderingContext2D, text: string, maxWidth: number, startSize: number, weight = 500) {
+  let size = startSize;
+  do {
+    context.font = `${weight} ${size}px Georgia, serif`;
+    if (context.measureText(text).width <= maxWidth) break;
+    size -= 2;
+  } while (size > 28);
+}
+
+function createLabelTexture(exhibit: Exhibit) {
+  const artwork = exhibit.artworkId ? artworkById[exhibit.artworkId] : undefined;
+  const canvas = document.createElement("canvas");
+  canvas.width = 1600;
+  canvas.height = 440;
+  const context = canvas.getContext("2d");
+  if (!context) return null;
+  context.fillStyle = "#d8ccb5";
   context.fillRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = "#9b7132";
-  context.fillRect(0, 0, 13, canvas.height);
-  context.fillStyle = "#263137";
-  context.font = "500 48px Georgia, serif";
-  context.fillText(title, 62, 105, 1070);
-  context.fillStyle = "rgba(38, 49, 55, 0.62)";
-  context.font = "500 25px monospace";
-  context.fillText("THE PERSONAL COLLECTION / OPEN ACCESS", 62, 177);
+  context.fillStyle = "#826231";
+  context.fillRect(0, 0, 18, canvas.height);
+  context.fillStyle = "#483326";
+  context.fillRect(18, 0, canvas.width - 18, 8);
+  context.fillStyle = "#6f5732";
+  context.font = "600 28px monospace";
+  context.fillText(`ON VIEW / ${(artwork?.room ?? exhibit.chapter).toUpperCase()}`, 72, 70);
+  context.fillStyle = "#202a2d";
+  fitText(context, artwork?.title ?? exhibit.title, 1450, 68, 600);
+  context.fillText(artwork?.title ?? exhibit.title, 72, 158);
+  context.fillStyle = "#3c4748";
+  context.font = "500 35px Georgia, serif";
+  context.fillText(`${artwork?.artist ?? "Personal collection"} · ${artwork?.year ?? ""}`, 72, 218, 1450);
+  context.strokeStyle = "rgba(54, 58, 54, 0.24)";
+  context.beginPath();
+  context.moveTo(72, 252);
+  context.lineTo(1528, 252);
+  context.stroke();
+  context.fillStyle = "#4f5855";
+  context.font = "500 24px monospace";
+  context.fillText(artwork?.medium?.toUpperCase() ?? "OPEN ACCESS IMAGE", 72, 302, 660);
+  context.fillText((artwork?.collection ?? "THE PERSONAL COLLECTION").toUpperCase(), 790, 302, 738);
+  context.fillStyle = "#354043";
+  context.font = "400 28px Georgia, serif";
+  context.fillText(artwork?.connection ?? "A work in Aditya Agrawal's personal museum.", 72, 372, 1450);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 8;
@@ -59,10 +110,10 @@ function createFrame(
 
   const imageMaterial = new THREE.MeshStandardMaterial({
     map: texture,
-    roughness: 0.68,
+    roughness: 0.54,
     metalness: 0.02,
-    emissive: 0xffffff,
-    emissiveIntensity: 0.025,
+    emissive: 0xfff4df,
+    emissiveIntensity: 0.045,
   });
   const image = new THREE.Mesh(new THREE.PlaneGeometry(exhibit.width, exhibit.height), imageMaterial);
   image.position.z = 0.09;
@@ -72,11 +123,11 @@ function createFrame(
   group.add(image);
   raycastTargets.push(image);
 
-  const wood = new THREE.MeshStandardMaterial({ color: 0x3f291d, roughness: 0.48, metalness: 0.08 });
+  const wood = new THREE.MeshStandardMaterial({ color: 0x332219, roughness: 0.4, metalness: 0.08 });
   const gilt = new THREE.MeshStandardMaterial({
-    color: 0xb68a42,
-    roughness: 0.27,
-    metalness: 0.82,
+    color: 0xb58a45,
+    roughness: 0.23,
+    metalness: 0.86,
     emissive: 0x000000,
     emissiveIntensity: 0,
   });
@@ -101,30 +152,32 @@ function createFrame(
     group.add(piece);
   });
 
-  const titleTexture = createLabelTexture(exhibit.title);
+  const titleTexture = createLabelTexture(exhibit);
   if (titleTexture) {
     createdTextures.push(titleTexture);
     const plaque = new THREE.Mesh(
-      new THREE.PlaneGeometry(Math.min(exhibit.width, 2.25), 0.45),
+      new THREE.PlaneGeometry(Math.min(Math.max(exhibit.width, 3.1), 4.15), 0.94),
       new THREE.MeshBasicMaterial({ map: titleTexture }),
     );
-    plaque.position.set(0, -exhibit.height / 2 - 0.5, 0.1);
+    plaque.position.set(0, -exhibit.height / 2 - 0.72, 0.11);
     group.add(plaque);
   }
   return group;
 }
 
-export default function Premium3DScene({ activeChapter, scrollProgress, onChapterChange, onArtworkSelect }: MuseumSceneProps) {
+export default function Premium3DScene({ activeChapter, scrollProgress, onChapterChange, onArtworkSelect, onReady }: MuseumSceneProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef(activeChapter);
   const progressRef = useRef(scrollProgress);
   const changeRef = useRef(onChapterChange);
   const artworkSelectRef = useRef(onArtworkSelect);
+  const readyRef = useRef(onReady);
 
   useEffect(() => { activeRef.current = activeChapter; }, [activeChapter]);
   useEffect(() => { progressRef.current = scrollProgress; }, [scrollProgress]);
   useEffect(() => { changeRef.current = onChapterChange; }, [onChapterChange]);
   useEffect(() => { artworkSelectRef.current = onArtworkSelect; }, [onArtworkSelect]);
+  useEffect(() => { readyRef.current = onReady; }, [onReady]);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -132,15 +185,15 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xb8ae9d);
-    scene.fog = new THREE.FogExp2(0xbcb19e, 0.0065);
+    scene.background = new THREE.Color(0xa89b87);
+    scene.fog = new THREE.FogExp2(0xb3a790, 0.0058);
 
     const camera = new THREE.PerspectiveCamera(47, 1, 0.1, 150);
     camera.position.set(0, 0.55, 10);
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.88;
+    renderer.toneMappingExposure = 0.96;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.domElement.className = "archive-canvas";
@@ -149,25 +202,45 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
     const gallery = new THREE.Group();
     scene.add(gallery);
 
-    const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xa9aa9b, roughness: 0.88, metalness: 0.01 });
-    const floorMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x9b9282,
-      roughness: 0.3,
-      metalness: 0.03,
-      clearcoat: 0.58,
-      clearcoatRoughness: 0.22,
+    const createdTextures: THREE.Texture[] = [];
+    const wallSurface = createSurfaceTexture();
+    const floorSurface = createSurfaceTexture();
+    if (wallSurface) {
+      wallSurface.repeat.set(3, 18);
+      createdTextures.push(wallSurface);
+    }
+    if (floorSurface) {
+      floorSurface.repeat.set(5, 32);
+      createdTextures.push(floorSurface);
+    }
+
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      color: 0xaaa995,
+      roughness: 0.82,
+      metalness: 0.01,
+      bumpMap: wallSurface,
+      bumpScale: 0.035,
     });
-    const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0xbeb19d, roughness: 0.9 });
-    const stoneMaterial = new THREE.MeshStandardMaterial({ color: 0x918675, roughness: 0.7, metalness: 0.02 });
-    const trimMaterial = new THREE.MeshStandardMaterial({ color: 0xc5b7a2, roughness: 0.62, metalness: 0.01 });
-    const dadoMaterial = new THREE.MeshStandardMaterial({ color: 0x7f847a, roughness: 0.9, metalness: 0.01 });
-    const walnutMaterial = new THREE.MeshStandardMaterial({ color: 0x38271e, roughness: 0.5, metalness: 0.04 });
-    const brassMaterial = new THREE.MeshStandardMaterial({ color: 0x76613f, roughness: 0.4, metalness: 0.68 });
+    const floorMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x786b5b,
+      roughness: 0.34,
+      metalness: 0.03,
+      clearcoat: 0.68,
+      clearcoatRoughness: 0.3,
+      bumpMap: floorSurface,
+      bumpScale: 0.018,
+    });
+    const ceilingMaterial = new THREE.MeshStandardMaterial({ color: 0xc2b59e, roughness: 0.86 });
+    const stoneMaterial = new THREE.MeshStandardMaterial({ color: 0x827867, roughness: 0.68, metalness: 0.02 });
+    const trimMaterial = new THREE.MeshStandardMaterial({ color: 0xc3b59f, roughness: 0.58, metalness: 0.01 });
+    const dadoMaterial = new THREE.MeshStandardMaterial({ color: 0x74796f, roughness: 0.84, metalness: 0.01 });
+    const walnutMaterial = new THREE.MeshStandardMaterial({ color: 0x302118, roughness: 0.42, metalness: 0.04 });
+    const brassMaterial = new THREE.MeshStandardMaterial({ color: 0x8a6a38, roughness: 0.34, metalness: 0.72 });
     const ironMaterial = new THREE.MeshStandardMaterial({ color: 0x42453f, roughness: 0.48, metalness: 0.72 });
     const daylightMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd5d0c2,
-      emissive: 0xe4d7bf,
-      emissiveIntensity: 0.2,
+      color: 0xd8d0bd,
+      emissive: 0xf1d7ad,
+      emissiveIntensity: 0.26,
       roughness: 0.22,
     });
 
@@ -212,7 +285,7 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
         crossbar.position.set(0, 5.08, z - 4.3 + offset);
         gallery.add(crossbar);
       }
-      const skyLight = new THREE.RectAreaLight(0xffe4bd, 2.6, 6, 7.5);
+      const skyLight = new THREE.RectAreaLight(0xffdfb6, 2.15, 6, 7.5);
       skyLight.position.set(0, 4.9, z - 4.3);
       skyLight.lookAt(0, -2, z - 4.3);
       scene.add(skyLight);
@@ -241,8 +314,8 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
       });
     }
 
-    scene.add(new THREE.HemisphereLight(0xd8d3c6, 0x655c4e, 0.92));
-    const sun = new THREE.DirectionalLight(0xffdbad, 1.55);
+    scene.add(new THREE.HemisphereLight(0xe2d8c2, 0x554b3f, 0.82));
+    const sun = new THREE.DirectionalLight(0xffd6a0, 1.72);
     sun.position.set(-8, 13, 9);
     sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024);
@@ -251,12 +324,18 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
     sun.shadow.camera.top = 10;
     sun.shadow.camera.bottom = -10;
     scene.add(sun);
-    const fill = new THREE.DirectionalLight(0xaeb9b4, 0.46);
+    const fill = new THREE.DirectionalLight(0xaeb9b4, 0.38);
     fill.position.set(9, 7, -18);
     scene.add(fill);
 
-    const createdTextures: THREE.Texture[] = [];
-    const textureLoader = new THREE.TextureLoader();
+    const loadingManager = new THREE.LoadingManager();
+    let readySignalled = false;
+    loadingManager.onLoad = () => {
+      if (readySignalled) return;
+      readySignalled = true;
+      window.requestAnimationFrame(() => readyRef.current());
+    };
+    const textureLoader = new THREE.TextureLoader(loadingManager);
 
     const exhibits: Exhibit[] = [
       { chapter: "philosophy", artworkId: "rembrandt-self-portrait", z: 6.85, side: "right", width: 2.75, height: 3.34, image: "/archive/rembrandt.jpg", title: "Self-Portrait / Rembrandt" },
@@ -280,14 +359,14 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
       if (!createdTextures.includes(texture)) createdTextures.push(texture);
       const frame = createFrame(texture, exhibit, raycastTargets, frameMaterials, createdTextures);
       const side = exhibit.side === "right" ? 1 : exhibit.side === "left" ? -1 : 0;
-      frame.position.set(side * 5.74, 0.55, exhibit.z);
+      frame.position.set(side * 5.74, 1.34, exhibit.z);
       frame.rotation.y = side * -Math.PI / 2;
       gallery.add(frame);
       frames.push(frame);
 
-      const spot = new THREE.SpotLight(0xffd79b, exhibit.artworkId ? 66 : 38, 15, Math.PI / 4.6, 0.62, 1.45);
-      spot.position.set(side * 4.35, 4.2, exhibit.z + (exhibit.side === "end" ? 4.2 : 1.4));
-      spot.target.position.set(side * 5.6, 0.5, exhibit.z);
+      const spot = new THREE.SpotLight(0xffc982, exhibit.artworkId ? 72 : 42, 15, Math.PI / 5.2, 0.7, 1.55);
+      spot.position.set(side * 4.25, 4.3, exhibit.z + (exhibit.side === "end" ? 4.2 : 1.25));
+      spot.target.position.set(side * 5.6, 1.15, exhibit.z);
       spot.castShadow = false;
       scene.add(spot, spot.target);
     });
@@ -355,7 +434,7 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
     const timer = new THREE.Timer();
     timer.connect(document);
     const targetScale = new THREE.Vector3();
-    const lookTarget = new THREE.Vector3(4.6, 0.4, 6.85);
+    const lookTarget = new THREE.Vector3(4.6, 0.9, 6.85);
     const desiredLookTarget = new THREE.Vector3();
     const roomSides = [1, 1, -1, 1, -1, 1, -1, 0];
     const roomCameraZ = [10, 2, -10, -22, -34, -46, -56, -67.2];
@@ -369,7 +448,10 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
       const mobile = window.innerWidth < 760;
       const roomPosition = progress * (roomCameraZ.length - 1);
       const roomIndex = Math.min(roomCameraZ.length - 2, Math.floor(roomPosition));
-      const roomMix = roomPosition - roomIndex;
+      const rawRoomMix = roomPosition - roomIndex;
+      const hold = 0.16;
+      const movingMix = THREE.MathUtils.clamp((rawRoomMix - hold) / (1 - hold * 2), 0, 1);
+      const roomMix = movingMix * movingMix * (3 - 2 * movingMix);
       const exhibitSide = THREE.MathUtils.lerp(roomSides[roomIndex], roomSides[roomIndex + 1], roomMix);
       const targetZ = THREE.MathUtils.lerp(roomCameraZ[roomIndex], roomCameraZ[roomIndex + 1], roomMix);
       const targetLookZ = THREE.MathUtils.lerp(roomLookZ[roomIndex], roomLookZ[roomIndex + 1], roomMix);
@@ -378,7 +460,7 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
       camera.position.x = THREE.MathUtils.damp(camera.position.x, smoothPointer.x * 0.14, 5.4, delta);
       camera.position.y = THREE.MathUtils.damp(camera.position.y, (mobile ? 0.28 : 0.38) + smoothPointer.y * 0.09, 5.4, delta);
       camera.position.z = THREE.MathUtils.damp(camera.position.z, targetZ, reducedMotion ? 16 : 5.8, delta);
-      desiredLookTarget.set(exhibitSide * (mobile ? 4.8 : 4.6), mobile ? 0.42 : 0.5, targetLookZ);
+      desiredLookTarget.set(exhibitSide * (mobile ? 4.7 : 4.6), mobile ? 0.82 : 0.92, targetLookZ);
       lookTarget.x = THREE.MathUtils.damp(lookTarget.x, desiredLookTarget.x, reducedMotion ? 16 : 5.2, delta);
       lookTarget.y = THREE.MathUtils.damp(lookTarget.y, desiredLookTarget.y, reducedMotion ? 16 : 5.2, delta);
       lookTarget.z = THREE.MathUtils.damp(lookTarget.z, desiredLookTarget.z, reducedMotion ? 16 : 5.2, delta);

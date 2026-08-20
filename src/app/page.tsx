@@ -13,14 +13,14 @@ import { profile } from "@/data/profile";
 
 const Premium3DScene = dynamic(() => import("@/components/Premium3DScene"), {
   ssr: false,
-  loading: () => <div className="archive-scene archive-scene-loading" aria-hidden="true" />,
+  loading: () => null,
 });
 
 const chapters: Array<{ id: ArchiveChapter; label: string; mark: string }> = [
-  { id: "philosophy", label: "Philosophy", mark: "φ" },
-  { id: "history", label: "History", mark: "H" },
-  { id: "art", label: "Art", mark: "A" },
-  { id: "markets", label: "Quant finance", mark: "Q" },
+  { id: "philosophy", label: "Philosophy", mark: "01" },
+  { id: "history", label: "History", mark: "02" },
+  { id: "art", label: "Art", mark: "03" },
+  { id: "markets", label: "Quant finance", mark: "04" },
 ];
 
 const nav = [
@@ -93,6 +93,7 @@ export default function Home() {
   const [journeyProgress, setJourneyProgress] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedArtwork, setSelectedArtwork] = useState<Artwork | null>(null);
+  const [sceneReady, setSceneReady] = useState(false);
 
   const liveProjects = useMemo(() => profile.projects.filter((project) => project.liveUrl), []);
   const closeArtwork = useCallback(() => setSelectedArtwork(null), []);
@@ -182,13 +183,33 @@ export default function Home() {
 
   return (
     <main className="archive-site">
+      <a className="skip-link" href="#index">Skip to the collection</a>
       <Premium3DScene
         activeChapter={activeChapter}
         scrollProgress={journeyProgress}
         onChapterChange={goToChapter}
         onArtworkSelect={(artworkId) => setSelectedArtwork(artworkById[artworkId] ?? null)}
+        onReady={() => setSceneReady(true)}
       />
       <div className="archive-atmosphere" aria-hidden="true" />
+
+      <motion.div
+        className="museum-loader"
+        role="status"
+        aria-live="polite"
+        initial={false}
+        animate={sceneReady ? { opacity: 0, visibility: "hidden" } : { opacity: 1, visibility: "visible" }}
+        transition={{ opacity: { duration: 0.75, delay: sceneReady ? 0.18 : 0 }, visibility: { delay: sceneReady ? 0.95 : 0 } }}
+      >
+        <div className="museum-loader-architecture" aria-hidden="true">
+          <div className="museum-loader-artwork" />
+        </div>
+        <div className="museum-loader-copy">
+          <span>Aditya Agrawal / The personal collection</span>
+          <strong>Preparing the entrance gallery</strong>
+          <i aria-hidden="true"><b /></i>
+        </div>
+      </motion.div>
 
       <header className="archive-header">
         <a href="#index" className="archive-monogram" aria-label="Aditya Agrawal, return to top" onClick={(event) => handleSectionLink(event, "#index")}>
@@ -230,6 +251,7 @@ export default function Home() {
       )}
 
       <aside className="chapter-rail" aria-label="Explore the four disciplines">
+        <p>Gallery directory</p>
         {chapters.map((chapter) => (
           <button
             key={chapter.id}
@@ -276,16 +298,7 @@ export default function Home() {
             <a href="#work" onClick={(event) => handleSectionLink(event, "#work")}>Selected work <ArrowDown size={16} /></a>
             <button type="button" onClick={() => goToChapter("philosophy")}>Enter the gallery <ArrowUpRight size={16} /></button>
           </motion.div>
-          <button
-            type="button"
-            className="hero-artwork-link"
-            onClick={() => setSelectedArtwork(artworks[0])}
-            aria-label="Inspect Self-Portrait by Rembrandt van Rijn"
-          >
-            <span>On view</span>
-            <strong>Self-Portrait / Rembrandt / 1660</strong>
-            <ArrowUpRight size={14} />
-          </button>
+          <ArtworkPlaque artwork={artworks[0]} onInspect={setSelectedArtwork} variant="hero" />
         </div>
         <p className="scene-caption">{sourceLabels[activeChapter]}</p>
       </section>

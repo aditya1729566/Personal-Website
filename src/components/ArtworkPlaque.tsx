@@ -6,12 +6,24 @@ import { useEffect, useRef } from "react";
 
 import type { Artwork } from "@/data/artworks";
 
-export function ArtworkPlaque({ artwork, onInspect }: { artwork: Artwork; onInspect: (artwork: Artwork) => void }) {
+export function ArtworkPlaque({
+  artwork,
+  onInspect,
+  variant = "standard",
+}: {
+  artwork: Artwork;
+  onInspect: (artwork: Artwork) => void;
+  variant?: "standard" | "hero";
+}) {
   return (
-    <button type="button" className="artwork-plaque" onClick={() => onInspect(artwork)} aria-label={`Inspect ${artwork.title} by ${artwork.artist}`}>
+    <button type="button" className={`artwork-plaque${variant === "hero" ? " artwork-plaque-hero" : ""}`} onClick={() => onInspect(artwork)} aria-label={`Inspect ${artwork.title} by ${artwork.artist}`}>
       <span className="artwork-plaque-kicker">On view / {artwork.room}</span>
       <strong>{artwork.title}</strong>
-      <span>{artwork.artist} · {artwork.year}</span>
+      <span className="artwork-plaque-credit">{artwork.artist} · {artwork.year}</span>
+      <span className="artwork-plaque-facts">
+        <span>{artwork.medium}</span>
+        <span>{artwork.collection}</span>
+      </span>
       <span className="artwork-plaque-reason">{artwork.connection}</span>
       <span className="artwork-plaque-action">Inspect work <Maximize2 size={13} /></span>
     </button>
@@ -64,6 +76,7 @@ export function ArtworkInspector({ artwork, onClose }: { artwork: Artwork | null
             role="dialog"
             aria-modal="true"
             aria-labelledby="artwork-inspector-title"
+            aria-describedby="artwork-inspector-description"
             initial={{ opacity: 0, y: 28, scale: 0.985 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.99 }}
@@ -85,7 +98,7 @@ export function ArtworkInspector({ artwork, onClose }: { artwork: Artwork | null
               <div className="artwork-inspector-reading">
                 <section>
                   <h3>About the work</h3>
-                  <p>{artwork.description}</p>
+                  <p id="artwork-inspector-description">{artwork.description}</p>
                 </section>
                 <section>
                   <h3>What it symbolizes here</h3>

@@ -43,6 +43,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${cormorant.variable} ${manrope.variable} ${plexMono.variable}`}>
+      <head>
+        <link rel="preload" as="image" href="/archive/rembrandt.jpg" fetchPriority="high" />
+      </head>
       <body className="antialiased">
         {children}
       </body>
