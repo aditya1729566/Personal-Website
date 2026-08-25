@@ -191,6 +191,28 @@ I enjoy exploring complex systems, challenging assumptions, and building project
       },
     },
     {
+      id: "benjamin-franklin",
+      title: "Benjamin Franklin: A Life of Curiosity",
+      tagline: "An interactive journey through Franklin's life and work",
+      category: "History · Editorial",
+      color: "#8b5e3c",
+      liveUrl: "https://benjaminfranklin.vercel.app",
+      summary:
+        "A cinematic, scroll-driven website tracing Benjamin Franklin's life as a printer, experimenter, diplomat, and public figure.",
+      details: {
+        overview:
+          "An interactive historical narrative that follows Franklin from his early years in Boston and Philadelphia through his work in printing, natural philosophy, diplomacy, and American public life.",
+        features: [
+          "Scroll-driven biographical storytelling",
+          "Historical chapters spanning Franklin's life and work",
+          "Archival imagery with an editorial visual system",
+          "Responsive presentation across desktop and mobile",
+        ],
+        tech: ["Next.js", "React", "Scroll Animation", "Responsive Design"],
+        status: "Live Project",
+      },
+    },
+    {
       id: "startup-exploration",
       title: "Startup Exploration",
       tagline: "AI, fintech, research, and scalable software ventures",
