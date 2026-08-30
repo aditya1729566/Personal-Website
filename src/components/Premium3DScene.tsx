@@ -154,7 +154,7 @@ function createFrame(
     group.add(piece);
   });
 
-  const titleTexture = exhibit.artworkId === "rembrandt-self-portrait" ? null : createLabelTexture(exhibit);
+  const titleTexture = exhibit.artworkId === "rubens-prometheus-bound" ? null : createLabelTexture(exhibit);
   if (titleTexture) {
     createdTextures.push(titleTexture);
     const plaque = new THREE.Sprite(new THREE.SpriteMaterial({ map: titleTexture, depthTest: false, depthWrite: false }));
@@ -199,6 +199,11 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.domElement.className = "archive-canvas";
+    renderer.domElement.setAttribute("role", "img");
+    renderer.domElement.setAttribute(
+      "aria-label",
+      "Interactive three-dimensional museum corridor featuring paintings connected to Aditya Agrawal's interests and work.",
+    );
     mount.appendChild(renderer.domElement);
 
     const gallery = new THREE.Group();
@@ -340,14 +345,14 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
     const textureLoader = new THREE.TextureLoader(loadingManager);
 
     const exhibits: Exhibit[] = [
-      { chapter: "philosophy", artworkId: "rembrandt-self-portrait", z: 6.85, side: "right", width: 2.75, height: 3.34, image: "/archive/rembrandt.jpg", title: "Self-Portrait / Rembrandt" },
-      { chapter: "philosophy", artworkId: "friedrich-moon", z: -4.25, side: "right", width: 4.35, height: 3.52, image: "/archive/friedrich.jpg", title: "Two Men Contemplating the Moon / Friedrich" },
-      { chapter: "history", artworkId: "leutze-washington", z: -16.15, side: "left", width: 5.45, height: 3.19, image: "/archive/washington.jpg", title: "Washington Crossing the Delaware / Leutze" },
-      { chapter: "art", artworkId: "van-gogh-cypresses", z: -28.15, side: "right", width: 4.75, height: 3.78, image: "/archive/van-gogh.jpg", title: "Wheat Field with Cypresses / Van Gogh" },
-      { chapter: "markets", artworkId: "turner-venice", z: -40.15, side: "left", width: 5, height: 3.73, image: "/archive/turner.jpg", title: "Venice from the Salute / Turner" },
-      { chapter: "history", artworkId: "pierre-harmonia", z: -52.15, side: "right", width: 3.35, height: 4.41, image: "/archive/harmonia.jpg", title: "The Death of Harmonia / Pierre" },
-      { chapter: "philosophy", artworkId: "vermeer-lute", z: -61.8, side: "left", width: 3.55, height: 4.08, image: "/archive/vermeer.jpg", title: "Young Woman with a Lute / Vermeer" },
-      { chapter: "art", artworkId: "turner-whalers", z: -75.01, side: "end", width: 4.8, height: 3.6, image: "/archive/whalers.jpg", title: "Whalers / Turner" },
+      { chapter: "philosophy", artworkId: "rubens-prometheus-bound", z: 6.85, side: "right", width: 2.75, height: 3.18, image: "/archive/rubens-prometheus-bound.webp", title: "Prometheus Bound / Rubens" },
+      { chapter: "philosophy", artworkId: "gowy-fall-of-icarus", z: -4.25, side: "right", width: 3.7, height: 4, image: "/archive/gowy-fall-of-icarus.webp", title: "The Fall of Icarus / Gowy" },
+      { chapter: "history", artworkId: "leutze-washington", z: -16.15, side: "left", width: 5.45, height: 3.19, image: "/archive/washington.webp", title: "Washington Crossing the Delaware / Leutze" },
+      { chapter: "art", artworkId: "david-cupid-psyche", z: -28.15, side: "right", width: 4.75, height: 3.6, image: "/archive/david-cupid-psyche.webp", title: "Love and Psyche / David" },
+      { chapter: "markets", artworkId: "david-telemachus-eucharis", z: -40.15, side: "left", width: 4.75, height: 4.05, image: "/archive/david-telemachus-eucharis.webp", title: "The Farewell of Telemachus and Eucharis / David" },
+      { chapter: "history", artworkId: "pierre-harmonia", z: -52.15, side: "right", width: 3.35, height: 4.41, image: "/archive/harmonia.webp", title: "The Death of Harmonia / Pierre" },
+      { chapter: "philosophy", artworkId: "retzsch-chess-players", z: -61.8, side: "left", width: 4.7, height: 3.71, image: "/archive/retzsch-chess-players.webp", title: "The Chess Players / Retzsch" },
+      { chapter: "art", artworkId: "leonardo-last-supper", z: -75.01, side: "end", width: 6.5, height: 3.41, image: "/archive/leonardo-last-supper.webp", title: "The Last Supper / Leonardo" },
     ];
 
     const raycastTargets: THREE.Mesh[] = [];

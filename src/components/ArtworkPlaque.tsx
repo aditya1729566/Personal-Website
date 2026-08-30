@@ -85,7 +85,13 @@ export function ArtworkInspector({ artwork, onClose }: { artwork: Artwork | null
             <button ref={closeRef} type="button" className="artwork-inspector-close" onClick={onClose} aria-label="Close artwork inspection"><X size={19} /></button>
             <div className="artwork-inspector-image-wrap">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={artwork.image} alt={`${artwork.title} by ${artwork.artist}`} className="artwork-inspector-image" />
+              <img
+                src={artwork.image}
+                width={artwork.imageWidth}
+                height={artwork.imageHeight}
+                alt={`${artwork.title} by ${artwork.artist}`}
+                className="artwork-inspector-image"
+              />
             </div>
             <div className="artwork-inspector-copy">
               <p className="archive-label">{artwork.room}</p>

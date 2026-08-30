@@ -32,21 +32,21 @@ const nav = [
 ];
 
 const sourceLabels: Record<ArchiveChapter, string> = {
-  philosophy: "Two Men Contemplating the Moon / c. 1825 / The Met",
+  philosophy: "The Fall of Icarus / 1636-38 / Museo del Prado",
   history: "Herodotos / 2nd century CE / The Met",
-  art: "Wheat Field with Cypresses / 1889 / The Met",
-  markets: "Venice from the Salute / c. 1835 / The Met",
+  art: "Love and Psyche / 1817 / Cleveland Museum of Art",
+  markets: "The Farewell of Telemachus and Eucharis / 1818 / Getty",
 };
 
 const roomLabels = [
-  "Self-Portrait / Rembrandt",
-  "Two Men Contemplating the Moon / Friedrich",
+  "Prometheus Bound / Rubens",
+  "The Fall of Icarus / Gowy",
   "Washington Crossing the Delaware / Leutze",
-  "Wheat Field with Cypresses / Van Gogh",
-  "Venice from the Salute / Turner",
+  "Love and Psyche / David",
+  "The Farewell of Telemachus and Eucharis / David",
   "The Death of Harmonia / Pierre",
-  "Young Woman with a Lute / Vermeer",
-  "Whalers / Turner",
+  "The Chess Players / Retzsch",
+  "The Last Supper / Leonardo",
 ];
 
 const chapterTargets: Record<ArchiveChapter, string> = {

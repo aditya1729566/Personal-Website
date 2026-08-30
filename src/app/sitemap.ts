@@ -3,8 +3,7 @@ import { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: "https://adityaagrawal.dev",
-      lastModified: new Date(),
+      url: "https://adityaag.com/",
       changeFrequency: "monthly",
       priority: 1,
     },
