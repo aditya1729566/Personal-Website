@@ -6,6 +6,7 @@ export const profile = {
   socialLinks: {
     x: "https://x.com/aditya_quant",
     github: "https://github.com/aditya1729566",
+    linkedin: "https://www.linkedin.com/in/aditya-agrawal-367337288/",
   },
   about: `I am a quantitative investor, researcher, entrepreneur, and mathematician with a deep interest in financial markets, economics, risk management, and emerging technologies. My work sits at the intersection of mathematics, finance, insurance, artificial intelligence, and entrepreneurship.
 

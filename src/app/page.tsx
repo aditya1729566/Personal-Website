@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowUpRight, Github, Menu, X } from "lucide-react";
+import { FaLinkedin } from "react-icons/fa";
 
 import { ArtworkInspector, ArtworkPlaque } from "@/components/ArtworkPlaque";
 import DigitalTwinChat from "@/components/DigitalTwinChat";
@@ -241,6 +242,7 @@ export default function Home() {
         <div className="archive-socials">
           <a href={profile.socialLinks.x} target="_blank" rel="noreferrer" aria-label="Aditya on X">X</a>
           <a href={profile.socialLinks.github} target="_blank" rel="noreferrer" aria-label="Aditya on GitHub"><Github size={17} /></a>
+          <a href={profile.socialLinks.linkedin} target="_blank" rel="noreferrer" aria-label="Aditya on LinkedIn"><FaLinkedin size={18} aria-hidden="true" /></a>
           <button type="button" className="archive-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" aria-expanded={menuOpen}>
             {menuOpen ? <X size={19} /> : <Menu size={19} />}
           </button>
@@ -447,6 +449,7 @@ export default function Home() {
             <div className="future-links">
               <a href={profile.socialLinks.github} target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={16} /></a>
               <a href={profile.socialLinks.x} target="_blank" rel="noreferrer">X / @aditya_quant <ArrowUpRight size={16} /></a>
+              <a href={profile.socialLinks.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowUpRight size={16} /></a>
             </div>
           </Reveal>
           <ArtworkPlaque artwork={artworks[7]} onInspect={setSelectedArtwork} />

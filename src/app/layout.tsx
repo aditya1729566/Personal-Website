@@ -85,7 +85,11 @@ const structuredData = {
       alternateName: "@aditya_quant",
       url: siteUrl,
       description: siteDescription,
-      sameAs: ["https://x.com/aditya_quant", "https://github.com/aditya1729566"],
+      sameAs: [
+        "https://x.com/aditya_quant",
+        "https://github.com/aditya1729566",
+        "https://www.linkedin.com/in/aditya-agrawal-367337288/",
+      ],
       knowsAbout: [
         "Quantitative research",
         "Quantitative finance",

@@ -78,6 +78,7 @@ ${profile.philosophyTopics.join(", ")}
 PUBLIC LINKS:
 - X: ${profile.socialLinks.x}
 - GitHub: ${profile.socialLinks.github}
+- LinkedIn: ${profile.socialLinks.linkedin}
 
 RULES:
 - Only answer as Aditya's digital twin about his career, work, research, goals, and interests
