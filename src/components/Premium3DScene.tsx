@@ -412,6 +412,8 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
     const smoothPointer = new THREE.Vector2(0, 0);
     const raycaster = new THREE.Raycaster();
     let hovered: THREE.Mesh | null = null;
+    let pointerCursorVisible = false;
+    let styledChapter: ArchiveChapter | null = null;
     let animationFrame = 0;
     let visible = !document.hidden;
 
@@ -486,7 +488,11 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
       raycaster.setFromCamera(smoothPointer, camera);
       const hit = raycaster.intersectObjects(raycastTargets, false)[0];
       hovered = hit?.object instanceof THREE.Mesh ? hit.object : null;
-      renderer.domElement.style.cursor = hovered ? "pointer" : "default";
+      const nextPointerCursorVisible = Boolean(hovered);
+      if (nextPointerCursorVisible !== pointerCursorVisible) {
+        renderer.domElement.style.cursor = nextPointerCursorVisible ? "pointer" : "default";
+        pointerCursorVisible = nextPointerCursorVisible;
+      }
       frames.forEach((frame) => {
         const chapter = frame.userData.chapter as ArchiveChapter;
         const isHovered = hovered?.userData.frame === frame;
@@ -494,10 +500,13 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
         targetScale.setScalar(scale);
         frame.scale.lerp(targetScale, reducedMotion ? 1 : 0.08);
       });
-      frameMaterials.forEach((material) => {
-        material.emissive.set(activeRef.current === "art" ? 0x1c1207 : 0x000000);
-        material.emissiveIntensity = activeRef.current === "art" ? 0.18 : 0;
-      });
+      if (styledChapter !== activeRef.current) {
+        frameMaterials.forEach((material) => {
+          material.emissive.set(activeRef.current === "art" ? 0x1c1207 : 0x000000);
+          material.emissiveIntensity = activeRef.current === "art" ? 0.18 : 0;
+        });
+        styledChapter = activeRef.current;
+      }
 
       if (!reducedMotion) dust.position.y = Math.sin(timestamp * 0.00018) * 0.05;
       renderer.render(scene, camera);
@@ -527,5 +536,5 @@ export default function Premium3DScene({ activeChapter, scrollProgress, onChapte
     };
   }, []);
 
-  return <div ref={mountRef} className="archive-scene" aria-hidden="true" />;
+  return <div ref={mountRef} className="archive-scene" />;
 }

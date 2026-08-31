@@ -98,17 +98,25 @@ export default function Home() {
   const liveProjects = useMemo(() => profile.projects.filter((project) => project.liveUrl), []);
   const closeArtwork = useCallback(() => setSelectedArtwork(null), []);
 
-  const goToSection = useCallback((sectionId: string) => {
+  const goToSection = useCallback((
+    sectionId: string,
+    options: { behavior?: ScrollBehavior; updateHash?: boolean } = {},
+  ) => {
     const section = document.getElementById(sectionId);
     if (!section) return;
+    const { behavior = "smooth", updateHash = true } = options;
+    const nextHash = `#${sectionId}`;
+    if (updateHash && window.location.hash !== nextHash) {
+      window.history.pushState(null, "", nextHash);
+    }
     if (sectionId === "index") {
-      window.scrollTo({ behavior: "smooth", top: 0 });
+      window.scrollTo({ behavior, top: 0 });
       return;
     }
     const roomCenter = section.offsetTop + section.offsetHeight / 2;
     const catalogueOffset = window.innerWidth < 760 ? -90 : 60;
     window.scrollTo({
-      behavior: "smooth",
+      behavior,
       top: roomCenter - window.innerHeight / 2 - catalogueOffset,
     });
   }, []);
@@ -122,6 +130,17 @@ export default function Home() {
     event.preventDefault();
     goToSection(href.slice(1));
   }, [goToSection]);
+
+  useEffect(() => {
+    if (!sceneReady) return;
+    const followLocationHash = () => {
+      const sectionId = window.location.hash.slice(1) || "index";
+      window.requestAnimationFrame(() => goToSection(sectionId, { behavior: "auto", updateHash: false }));
+    };
+    followLocationHash();
+    window.addEventListener("popstate", followLocationHash);
+    return () => window.removeEventListener("popstate", followLocationHash);
+  }, [goToSection, sceneReady]);
 
   useEffect(() => {
     let frame = 0;

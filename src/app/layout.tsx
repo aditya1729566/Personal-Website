@@ -39,15 +39,6 @@ export const metadata: Metadata = {
   authors: [{ name: "Aditya Agrawal", url: siteUrl }],
   creator: "Aditya Agrawal",
   publisher: "Aditya Agrawal",
-  keywords: [
-    "Aditya Agrawal",
-    "quantitative research",
-    "quantitative finance",
-    "systematic trading",
-    "statistical arbitrage",
-    "mathematics",
-    "software development",
-  ],
   robots: {
     index: true,
     follow: true,
@@ -91,6 +82,7 @@ const structuredData = {
       "@type": "Person",
       "@id": `${siteUrl}#person`,
       name: "Aditya Agrawal",
+      alternateName: "@aditya_quant",
       url: siteUrl,
       description: siteDescription,
       sameAs: ["https://x.com/aditya_quant", "https://github.com/aditya1729566"],

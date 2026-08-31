@@ -4,8 +4,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: "https://adityaag.com/",
-      changeFrequency: "monthly",
-      priority: 1,
+      lastModified: new Date("2026-08-31"),
     },
   ];
 }
