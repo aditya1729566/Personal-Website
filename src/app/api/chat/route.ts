@@ -1,11 +1,9 @@
 import { buildDigitalTwinSystemPrompt } from "@/lib/digital-twin-prompt";
 
-const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const DEFAULT_MODELS = [
-  "openai/gpt-oss-20b:free",
-  "openai/gpt-oss-120b:free",
-  "meta-llama/llama-3.3-70b-instruct:free",
-];
+const OPENROUTER_URL =
+  process.env.OPENROUTER_API_URL ||
+  "https://openrouter.ai/api/v1/chat/completions";
+const DEFAULT_MODELS = ["openrouter/free"];
 const REQUEST_TIMEOUT_MS = 30000;
 
 type ChatMessage = {
@@ -33,7 +31,15 @@ function getModelCandidates() {
 }
 
 function shouldTryNextModel(status: number) {
-  return status === 408 || status === 409 || status === 429 || status >= 500;
+  return (
+    status === 400 ||
+    status === 402 ||
+    status === 404 ||
+    status === 408 ||
+    status === 409 ||
+    status === 429 ||
+    status >= 500
+  );
 }
 
 function getClientErrorMessage(errors: OpenRouterError[]) {
@@ -41,7 +47,7 @@ function getClientErrorMessage(errors: OpenRouterError[]) {
     return "The AI providers are temporarily rate-limited. Please try again in a minute.";
   }
 
-  return "Failed to get a response from the AI model.";
+  return "The inquiry desk is temporarily unavailable. Please try again shortly.";
 }
 
 export async function POST(request: Request) {
@@ -99,8 +105,8 @@ export async function POST(request: Request) {
           },
           body: JSON.stringify({
             model,
-            temperature: 0.2,
-            max_tokens: 450,
+            temperature: 0.45,
+            max_tokens: 220,
             messages: [
               { role: "system", content: buildDigitalTwinSystemPrompt() },
               ...sanitized,

@@ -12,8 +12,8 @@ type Message = {
 const SUGGESTED_PROMPTS = [
   "Summarize Aditya's projects",
   "What is Aditya studying right now?",
-  "What is his quant research about?",
-  "What are his long-term goals?",
+  "What makes a decision rational?",
+  "Why does history matter?",
 ];
 
 export default function DigitalTwinChat() {
@@ -22,7 +22,7 @@ export default function DigitalTwinChat() {
     {
       role: "assistant",
       content:
-        "This desk uses Aditya's profile record. Ask about his Kalman-filter research, projects, reading, or current study.",
+        "Ask about Aditya's work, or bring me any question. I will keep the answer brief and place it in a wider frame.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -169,7 +169,7 @@ export default function DigitalTwinChat() {
                   }}
                   rows={1}
                   disabled={loading}
-                  placeholder="Ask about Aditya..."
+                  placeholder="Ask anything..."
                   className="museum-chat-input"
                 />
                 <button
