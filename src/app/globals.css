@@ -242,6 +242,22 @@ button { color: inherit; }
   background: rgba(155, 113, 50, 0.09);
   color: var(--archive-gilt);
 }
+.codeforces-mark {
+  display: flex;
+  width: 1.15rem;
+  height: 1rem;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.12rem;
+}
+.codeforces-mark i {
+  display: block;
+  width: 0.28rem;
+  border-radius: 0.04rem 0.04rem 0 0;
+}
+.codeforces-mark i:nth-child(1) { height: 0.68rem; background: #f2c94c; }
+.codeforces-mark i:nth-child(2) { height: 1rem; background: #2f80c9; }
+.codeforces-mark i:nth-child(3) { height: 0.82rem; background: #c9453d; }
 .archive-menu-button { display: none; cursor: pointer; }
 
 .archive-mobile-nav { display: none; }

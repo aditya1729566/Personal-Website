@@ -7,7 +7,9 @@ export const profile = {
     x: "https://x.com/aditya_quant",
     github: "https://github.com/aditya1729566",
     linkedin: "https://www.linkedin.com/in/aditya-agrawal-367337288/",
+    codeforces: "https://codeforces.com/profile/AnarchistGoverner",
   },
+  resumeUrl: "/aditya-agrawal-resume.pdf",
   about: `I am a quantitative investor, researcher, entrepreneur, and mathematician with a deep interest in financial markets, economics, risk management, and emerging technologies. My work sits at the intersection of mathematics, finance, insurance, artificial intelligence, and entrepreneurship.
 
 I enjoy exploring complex systems, challenging assumptions, and building projects that combine rigorous analytical thinking with practical real-world applications. My long-term ambition is to conduct impactful research, build successful businesses, and eventually manage a world-class hedge fund focused on quantitative and systematic investing.`,

@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Github, Menu, X } from "lucide-react";
+import { ArrowDown, ArrowUpRight, FileText, Github, Menu, X } from "lucide-react";
 import { FaLinkedin } from "react-icons/fa";
 
 import { ArtworkInspector, ArtworkPlaque } from "@/components/ArtworkPlaque";
@@ -16,6 +16,16 @@ const Premium3DScene = dynamic(() => import("@/components/Premium3DScene"), {
   ssr: false,
   loading: () => null,
 });
+
+function CodeforcesMark() {
+  return (
+    <span className="codeforces-mark" aria-hidden="true">
+      <i />
+      <i />
+      <i />
+    </span>
+  );
+}
 
 const chapters: Array<{ id: ArchiveChapter; label: string; mark: string }> = [
   { id: "philosophy", label: "Philosophy", mark: "01" },
@@ -238,11 +248,13 @@ export default function Home() {
         </a>
         <nav className="archive-nav" aria-label="Main navigation">
           {nav.map((item) => <a key={item.href} href={item.href} onClick={(event) => handleSectionLink(event, item.href)}>{item.label}</a>)}
+          <a href={profile.resumeUrl} target="_blank" rel="noreferrer">Resume</a>
         </nav>
         <div className="archive-socials">
           <a href={profile.socialLinks.x} target="_blank" rel="noreferrer" aria-label="Aditya on X">X</a>
           <a href={profile.socialLinks.github} target="_blank" rel="noreferrer" aria-label="Aditya on GitHub"><Github size={17} /></a>
           <a href={profile.socialLinks.linkedin} target="_blank" rel="noreferrer" aria-label="Aditya on LinkedIn"><FaLinkedin size={18} aria-hidden="true" /></a>
+          <a href={profile.socialLinks.codeforces} target="_blank" rel="noreferrer" aria-label="Aditya on Codeforces"><CodeforcesMark /></a>
           <button type="button" className="archive-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Toggle navigation" aria-expanded={menuOpen}>
             {menuOpen ? <X size={19} /> : <Menu size={19} />}
           </button>
@@ -268,6 +280,7 @@ export default function Home() {
               {item.label}
             </a>
           ))}
+          <a href={profile.resumeUrl} target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}>Resume</a>
         </motion.nav>
       )}
 
@@ -450,6 +463,8 @@ export default function Home() {
               <a href={profile.socialLinks.github} target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={16} /></a>
               <a href={profile.socialLinks.x} target="_blank" rel="noreferrer">X / @aditya_quant <ArrowUpRight size={16} /></a>
               <a href={profile.socialLinks.linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowUpRight size={16} /></a>
+              <a href={profile.socialLinks.codeforces} target="_blank" rel="noreferrer">Codeforces / AnarchistGoverner <ArrowUpRight size={16} /></a>
+              <a href={profile.resumeUrl} target="_blank" rel="noreferrer">Resume <FileText size={16} /></a>
             </div>
           </Reveal>
           <ArtworkPlaque artwork={artworks[7]} onInspect={setSelectedArtwork} />

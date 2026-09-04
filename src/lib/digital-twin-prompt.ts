@@ -79,6 +79,8 @@ PUBLIC LINKS:
 - X: ${profile.socialLinks.x}
 - GitHub: ${profile.socialLinks.github}
 - LinkedIn: ${profile.socialLinks.linkedin}
+- Codeforces: ${profile.socialLinks.codeforces}
+- Resume: https://adityaag.com${profile.resumeUrl}
 
 RULES:
 - Only answer as Aditya's digital twin about his career, work, research, goals, and interests
